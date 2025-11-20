@@ -457,37 +457,223 @@ def emitir_notas(request):
         notas_ids = request.POST.getlist('notas[]')
         
         if not notas_ids:
-            messages.error(request, 'Nenhuma nota selecionada.')
-            return redirect('nfse_nacional:emitir')
+            return JsonResponse({
+                'sucesso': False,
+                'mensagem': 'Nenhuma nota selecionada.'
+            })
         
-        # TODO: Implementar integração com API Nacional
-        messages.info(request, f'Emissão de {len(notas_ids)} nota(s) em desenvolvimento.')
+        # Processar emissão
+        from .services import ProcessadorNFSeNacional
+        resultados = []
+        emitidas = 0
+        erros = 0
+        
+        for nota_id in notas_ids:
+            try:
+                nota = NotaFiscalNacional.objects.get(id=nota_id)
+                
+                # Verificar se já foi emitida
+                if nota.status_nfse in ['emitida', 'cancelada']:
+                    resultados.append({
+                        'id': nota_id,
+                        'sucesso': False,
+                        'numero_documento': nota.numero_rps or str(nota.id),
+                        'tomador': nota.nome_tomador,
+                        'valor': float(nota.valor_total),
+                        'mensagem': f'❌ Nota {nota.numero_rps or nota.id}\n'\
+                                   f'Não pode ser emitida:\n\n'\
+                                   f'Status atual: {nota.get_status_nfse_display()}\n'\
+                                   f'Tomador: {nota.nome_tomador}\n'\
+                                   f'Valor: R$ {nota.valor_total:,.2f}'
+                    })
+                    erros += 1
+                    continue
+                
+                # Emitir nota
+                processador = ProcessadorNFSeNacional(nota.empresa)
+                resultado = processador.emitir_nota(nota)
+                
+                if resultado['sucesso']:
+                    emitidas += 1
+                    resultados.append({
+                        'id': nota_id,
+                        'sucesso': True,
+                        'numero_documento': nota.numero_rps or str(nota.id),
+                        'tomador': nota.nome_tomador,
+                        'valor': float(nota.valor_total),
+                        'mensagem': f'✅ Nota {nota.numero_rps or nota.id}\n'\
+                                   f'Emitida com sucesso!\n'\
+                                   f'Tomador: {nota.nome_tomador}\n'\
+                                   f'Valor: R$ {nota.valor_total:,.2f}'
+                    })
+                else:
+                    erros += 1
+                    resultados.append({
+                        'id': nota_id,
+                        'sucesso': False,
+                        'numero_documento': nota.numero_rps or str(nota.id),
+                        'tomador': nota.nome_tomador,
+                        'valor': float(nota.valor_total),
+                        'mensagem': resultado.get('mensagem', 'Erro desconhecido')
+                    })
+                    
+            except Exception as e:
+                erros += 1
+                resultados.append({
+                    'id': nota_id,
+                    'sucesso': False,
+                    'mensagem': f'Erro: {str(e)}'
+                })
+        
+        # Mensagem de resumo profissional
+        if emitidas > 0 and erros == 0:
+            mensagem_resumo = f'🎉 Emissão concluída com sucesso!\n\nTodas as {emitidas} nota(s) foram emitidas corretamente.'
+        elif emitidas > 0 and erros > 0:
+            mensagem_resumo = f'⚠️ Emissão concluída com avisos.\n\n{emitidas} nota(s) emitida(s) com sucesso.\n{erros} nota(s) com erro.'
+        else:
+            mensagem_resumo = f'❌ Não foi possível emitir as notas.\n\n{erros} erro(s) encontrado(s).'
+        
+        return JsonResponse({
+            'sucesso': emitidas > 0,
+            'mensagem': mensagem_resumo,
+            'emitidas': emitidas,
+            'erros': erros,
+            'total': len(notas_ids),
+            'resultados': resultados
+        })
     
-    return redirect('nfse_nacional:emitir')
+    return JsonResponse({'sucesso': False, 'mensagem': 'Método não permitido'})
 
 
 @login_required
 def excluir_notas(request):
-    """Exclui notas pendentes selecionadas"""
+    """Exclui notas não emitidas selecionadas (pendentes, com erro ou sem status)"""
     if request.method == 'POST':
         notas_ids = request.POST.getlist('notas[]')
         
         if not notas_ids:
-            messages.error(request, 'Nenhuma nota selecionada.')
-            return redirect('nfse_nacional:emitir')
+            return JsonResponse({
+                'sucesso': False,
+                'mensagem': 'Nenhuma nota selecionada.'
+            })
         
-        # Excluir apenas pendentes
-        excluidas = NotaFiscalNacional.objects.filter(
-            id__in=notas_ids,
-            status_nfse='pendente'
-        ).delete()[0]
+        # Buscar informações das notas antes de excluir
+        from django.db.models import Q
+        notas_para_excluir = NotaFiscalNacional.objects.filter(
+            id__in=notas_ids
+        ).filter(
+            Q(status_nfse='pendente') | 
+            Q(status_nfse='erro') | 
+            Q(status_nfse__isnull=True) | 
+            Q(status_nfse='')
+        )
+        
+        resultados = []
+        for nota in notas_para_excluir:
+            resultados.append({
+                'id': nota.id,
+                'numero_documento': nota.numero_rps or str(nota.id),
+                'tomador': nota.nome_tomador,
+                'valor': float(nota.valor_total),
+                'status': nota.get_status_nfse_display() if nota.status_nfse else 'Sem Status'
+            })
+        
+        # Excluir notas
+        excluidas = notas_para_excluir.delete()[0]
         
         if excluidas > 0:
-            messages.success(request, f'{excluidas} nota(s) excluída(s) com sucesso.')
+            mensagem_resumo = f'🎉 Exclusão concluída com sucesso!\n\n{excluidas} nota(s) excluída(s).'
+            return JsonResponse({
+                'sucesso': True,
+                'mensagem': mensagem_resumo,
+                'excluidas': excluidas,
+                'total': len(notas_ids),
+                'resultados': resultados
+            })
         else:
-            messages.warning(request, 'Nenhuma nota pendente foi excluída.')
+            return JsonResponse({
+                'sucesso': False,
+                'mensagem': '❌ Nenhuma nota foi excluída.\n\nApenas notas pendentes, com erro ou sem status podem ser excluídas.'
+            })
     
-    return redirect('nfse_nacional:emitir')
+    return JsonResponse({'sucesso': False, 'mensagem': 'Método não permitido'})
+
+
+@login_required
+def editar_nota(request, nota_id):
+    """Edita uma nota fiscal pendente"""
+    nota = get_object_or_404(NotaFiscalNacional, id=nota_id)
+    
+    # Verificar se a nota pode ser editada (apenas pendentes ou com erro)
+    if nota.status_nfse not in ['pendente', 'erro']:
+        messages.error(request, 'Apenas notas pendentes ou com erro podem ser editadas.')
+        return redirect('nfse_nacional:emitir')
+    
+    if request.method == 'POST':
+        try:
+            # Atualizar dados do tomador
+            nota.cnpj_cpf_tomador = request.POST.get('cnpj_cpf_tomador', '').strip()
+            nota.nome_tomador = request.POST.get('nome_tomador', '').strip()
+            nota.inscricao_municipal_tomador = request.POST.get('inscricao_municipal_tomador', '').strip() or None
+            nota.email_tomador = request.POST.get('email_tomador', '').strip() or None
+            
+            # Endereço
+            nota.logradouro_tomador = request.POST.get('logradouro_tomador', '').strip() or None
+            nota.numero_tomador = request.POST.get('numero_tomador', '').strip() or None
+            nota.complemento_tomador = request.POST.get('complemento_tomador', '').strip() or None
+            nota.bairro_tomador = request.POST.get('bairro_tomador', '').strip() or None
+            nota.cidade_tomador = request.POST.get('cidade_tomador', '').strip() or None
+            nota.uf_tomador = request.POST.get('uf_tomador', '').strip() or None
+            nota.cep_tomador = request.POST.get('cep_tomador', '').strip() or None
+            
+            # Serviço
+            data_emissao_str = request.POST.get('data_emissao')
+            if data_emissao_str:
+                nota.data_emissao = datetime.strptime(data_emissao_str, '%Y-%m-%d').date()
+            
+            nota.cod_servico = request.POST.get('cod_servico', '').strip()
+            nota.cod_tributacao_municipio = request.POST.get('cod_tributacao_municipio', '').strip() or None
+            nota.descricao = request.POST.get('descricao', '').strip()
+            nota.valor_total = Decimal(request.POST.get('valor_total', '0'))
+            nota.deducoes = Decimal(request.POST.get('deducoes', '0'))
+            nota.desconto_incondicionado = Decimal(request.POST.get('desconto_incondicionado', '0'))
+            nota.desconto_condicionado = Decimal(request.POST.get('desconto_condicionado', '0'))
+            
+            # ISS
+            nota.aliquota_iss = Decimal(request.POST.get('aliquota_iss', '0'))
+            nota.tipo_tributacao = request.POST.get('tipo_tributacao', 'T').strip()[0].upper()
+            nota.iss_retido = request.POST.get('iss_retido') == 'on'
+            nota.municipio_incidencia = request.POST.get('municipio_incidencia', '').strip() or None
+            
+            # Retenções
+            nota.pis_retido = Decimal(request.POST.get('pis_retido', '0'))
+            nota.cofins_retido = Decimal(request.POST.get('cofins_retido', '0'))
+            nota.irrf_retido = Decimal(request.POST.get('irrf_retido', '0'))
+            nota.csll_retido = Decimal(request.POST.get('csll_retido', '0'))
+            nota.inss_retido = Decimal(request.POST.get('inss_retido', '0'))
+            
+            # RPS
+            nota.numero_rps = request.POST.get('numero_rps', '').strip() or None
+            nota.serie_rps = request.POST.get('serie_rps', '').strip() or None
+            nota.observacoes = request.POST.get('observacoes', '').strip() or None
+            
+            # Limpar mensagem de erro se estava com erro
+            if nota.status_nfse == 'erro':
+                nota.mensagem_erro = None
+                nota.status_nfse = 'pendente'
+            
+            nota.save()
+            messages.success(request, 'Nota atualizada com sucesso!')
+            return redirect('nfse_nacional:emitir')
+            
+        except Exception as e:
+            messages.error(request, f'Erro ao atualizar nota: {str(e)}')
+    
+    context = {
+        'nota': nota,
+        'user': request.user,
+    }
+    return render(request, 'nfse_nacional/editar_nota.html', context)
 
 
 @login_required

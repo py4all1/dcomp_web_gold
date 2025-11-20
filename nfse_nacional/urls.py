@@ -11,4 +11,5 @@ urlpatterns = [
     path('cancelar-notas/', views.cancelar_notas, name='cancelar_notas'),
     path('salvar-pdfs/', views.salvar_pdfs, name='salvar_pdfs'),
     path('detalhes-nota/<int:nota_id>/', views.detalhes_nota, name='detalhes_nota'),
+    path('editar-nota/<int:nota_id>/', views.editar_nota, name='editar_nota'),
 ]

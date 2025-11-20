@@ -1,0 +1,233 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Editar Nota - Tax Gold{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <div class="row mb-4">
+        <div class="col-12">
+            <h2><i class="bi bi-pencil-square"></i> Editar Nota Nacional de Serviço</h2>
+            <p class="text-muted">ID: {{ nota.id }} | Status: {{ nota.get_status_nfse_display }}</p>
+        </div>
+    </div>
+
+    <form method="post">
+        {% csrf_token %}
+        
+        <!-- Dados do Tomador -->
+        <div class="card mb-4">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0"><i class="bi bi-person"></i> Dados do Tomador</h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-3 mb-3">
+                        <label class="form-label">CNPJ/CPF <span class="text-danger">*</span></label>
+                        <input type="text" name="cnpj_cpf_tomador" class="form-control" value="{{ nota.cnpj_cpf_tomador }}" required>
+                    </div>
+                    <div class="col-md-5 mb-3">
+                        <label class="form-label">Nome/Razão Social <span class="text-danger">*</span></label>
+                        <input type="text" name="nome_tomador" class="form-control" value="{{ nota.nome_tomador }}" required>
+                    </div>
+                    <div class="col-md-2 mb-3">
+                        <label class="form-label">Inscrição Municipal</label>
+                        <input type="text" name="inscricao_municipal_tomador" class="form-control" value="{{ nota.inscricao_municipal_tomador|default:'' }}">
+                    </div>
+                    <div class="col-md-2 mb-3">
+                        <label class="form-label">E-mail</label>
+                        <input type="email" name="email_tomador" class="form-control" value="{{ nota.email_tomador|default:'' }}">
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Endereço -->
+        <div class="card mb-4">
+            <div class="card-header bg-secondary text-white">
+                <h5 class="mb-0"><i class="bi bi-geo-alt"></i> Endereço</h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-4 mb-3">
+                        <label class="form-label">Logradouro</label>
+                        <input type="text" name="logradouro_tomador" class="form-control" value="{{ nota.logradouro_tomador|default:'' }}">
+                    </div>
+                    <div class="col-md-2 mb-3">
+                        <label class="form-label">Número</label>
+                        <input type="text" name="numero_tomador" class="form-control" value="{{ nota.numero_tomador|default:'' }}">
+                    </div>
+                    <div class="col-md-2 mb-3">
+                        <label class="form-label">Complemento</label>
+                        <input type="text" name="complemento_tomador" class="form-control" value="{{ nota.complemento_tomador|default:'' }}">
+                    </div>
+                    <div class="col-md-2 mb-3">
+                        <label class="form-label">Bairro</label>
+                        <input type="text" name="bairro_tomador" class="form-control" value="{{ nota.bairro_tomador|default:'' }}">
+                    </div>
+                    <div class="col-md-2 mb-3">
+                        <label class="form-label">CEP</label>
+                        <input type="text" name="cep_tomador" class="form-control" value="{{ nota.cep_tomador|default:'' }}">
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-4 mb-3">
+                        <label class="form-label">Cidade</label>
+                        <input type="text" name="cidade_tomador" class="form-control" value="{{ nota.cidade_tomador|default:'' }}">
+                    </div>
+                    <div class="col-md-2 mb-3">
+                        <label class="form-label">UF</label>
+                        <input type="text" name="uf_tomador" class="form-control" maxlength="2" value="{{ nota.uf_tomador|default:'' }}">
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Dados do Serviço -->
+        <div class="card mb-4">
+            <div class="card-header bg-warning text-dark">
+                <h5 class="mb-0"><i class="bi bi-briefcase"></i> Dados do Serviço</h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-2 mb-3">
+                        <label class="form-label">Data Emissão <span class="text-danger">*</span></label>
+                        <input type="date" name="data_emissao" class="form-control" value="{{ nota.data_emissao|date:'Y-m-d' }}" required>
+                    </div>
+                    <div class="col-md-2 mb-3">
+                        <label class="form-label">Código Serviço <span class="text-danger">*</span></label>
+                        <input type="text" name="cod_servico" class="form-control" value="{{ nota.cod_servico }}" required>
+                    </div>
+                    <div class="col-md-2 mb-3">
+                        <label class="form-label">Cód. Tributação</label>
+                        <input type="text" name="cod_tributacao_municipio" class="form-control" value="{{ nota.cod_tributacao_municipio|default:'' }}">
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">Descrição <span class="text-danger">*</span></label>
+                        <textarea name="descricao" class="form-control" rows="2" required>{{ nota.descricao }}</textarea>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-3 mb-3">
+                        <label class="form-label">Valor Total <span class="text-danger">*</span></label>
+                        <input type="number" name="valor_total" class="form-control" step="0.01" value="{{ nota.valor_total }}" required>
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <label class="form-label">Deduções</label>
+                        <input type="number" name="deducoes" class="form-control" step="0.01" value="{{ nota.deducoes }}">
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <label class="form-label">Desconto Incondicionado</label>
+                        <input type="number" name="desconto_incondicionado" class="form-control" step="0.01" value="{{ nota.desconto_incondicionado }}">
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <label class="form-label">Desconto Condicionado</label>
+                        <input type="number" name="desconto_condicionado" class="form-control" step="0.01" value="{{ nota.desconto_condicionado }}">
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ISS -->
+        <div class="card mb-4">
+            <div class="card-header bg-info text-white">
+                <h5 class="mb-0"><i class="bi bi-bank"></i> ISS</h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-2 mb-3">
+                        <label class="form-label">Alíquota ISS (%) <span class="text-danger">*</span></label>
+                        <input type="number" name="aliquota_iss" class="form-control" step="0.01" value="{{ nota.aliquota_iss }}" required>
+                    </div>
+                    <div class="col-md-2 mb-3">
+                        <label class="form-label">Tipo Tributação <span class="text-danger">*</span></label>
+                        <select name="tipo_tributacao" class="form-select" required>
+                            <option value="T" {% if nota.tipo_tributacao == 'T' %}selected{% endif %}>Tributado</option>
+                            <option value="F" {% if nota.tipo_tributacao == 'F' %}selected{% endif %}>Fora do Município</option>
+                            <option value="I" {% if nota.tipo_tributacao == 'I' %}selected{% endif %}>Isento</option>
+                            <option value="N" {% if nota.tipo_tributacao == 'N' %}selected{% endif %}>Não Tributado</option>
+                        </select>
+                    </div>
+                    <div class="col-md-2 mb-3">
+                        <label class="form-label">ISS Retido</label>
+                        <div class="form-check form-switch mt-2">
+                            <input class="form-check-input" type="checkbox" name="iss_retido" {% if nota.iss_retido %}checked{% endif %}>
+                            <label class="form-check-label">Sim</label>
+                        </div>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">Município de Incidência</label>
+                        <input type="text" name="municipio_incidencia" class="form-control" value="{{ nota.municipio_incidencia|default:'' }}">
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Retenções -->
+        <div class="card mb-4">
+            <div class="card-header bg-danger text-white">
+                <h5 class="mb-0"><i class="bi bi-cash-stack"></i> Retenções</h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-2 mb-3">
+                        <label class="form-label">PIS Retido</label>
+                        <input type="number" name="pis_retido" class="form-control" step="0.01" value="{{ nota.pis_retido }}">
+                    </div>
+                    <div class="col-md-2 mb-3">
+                        <label class="form-label">COFINS Retido</label>
+                        <input type="number" name="cofins_retido" class="form-control" step="0.01" value="{{ nota.cofins_retido }}">
+                    </div>
+                    <div class="col-md-2 mb-3">
+                        <label class="form-label">IRRF Retido</label>
+                        <input type="number" name="irrf_retido" class="form-control" step="0.01" value="{{ nota.irrf_retido }}">
+                    </div>
+                    <div class="col-md-2 mb-3">
+                        <label class="form-label">CSLL Retido</label>
+                        <input type="number" name="csll_retido" class="form-control" step="0.01" value="{{ nota.csll_retido }}">
+                    </div>
+                    <div class="col-md-2 mb-3">
+                        <label class="form-label">INSS Retido</label>
+                        <input type="number" name="inss_retido" class="form-control" step="0.01" value="{{ nota.inss_retido }}">
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- RPS e Observações -->
+        <div class="card mb-4">
+            <div class="card-header bg-dark text-white">
+                <h5 class="mb-0"><i class="bi bi-file-text"></i> RPS e Observações</h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-2 mb-3">
+                        <label class="form-label">Número RPS</label>
+                        <input type="text" name="numero_rps" class="form-control" value="{{ nota.numero_rps|default:'' }}">
+                    </div>
+                    <div class="col-md-2 mb-3">
+                        <label class="form-label">Série RPS</label>
+                        <input type="text" name="serie_rps" class="form-control" value="{{ nota.serie_rps|default:'' }}">
+                    </div>
+                    <div class="col-md-8 mb-3">
+                        <label class="form-label">Observações</label>
+                        <textarea name="observacoes" class="form-control" rows="2">{{ nota.observacoes|default:'' }}</textarea>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Botões -->
+        <div class="row">
+            <div class="col-12">
+                <button type="submit" class="btn btn-primary btn-lg">
+                    <i class="bi bi-check-circle"></i> Salvar Alterações
+                </button>
+                <a href="{% url 'nfse_nacional:emitir' %}" class="btn btn-secondary btn-lg">
+                    <i class="bi bi-x-circle"></i> Cancelar
+                </a>
+            </div>
+        </div>
+    </form>
+</div>
+{% endblock %}

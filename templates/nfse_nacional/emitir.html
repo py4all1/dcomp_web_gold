@@ -193,7 +193,7 @@
                                         <tr>
                                             <td>
                                                 <input type="checkbox" class="nota-checkbox" value="{{ nota.id }}" 
-                                                       data-status="{{ nota.status_rps }}">
+                                                       data-status="{{ nota.status_nfse }}">
                                             </td>
                                             <td>{{ nota.id }}</td>
                                             <td>{{ nota.nome_tomador }}</td>
@@ -203,22 +203,33 @@
                                             <td>R$ {{ nota.valor_iss|floatformat:2 }}</td>
                                             <td>{{ nota.data_emissao|date:"d/m/Y"|default:"-" }}</td>
                                             <td>
-                                                {% if nota.status_rps == 'pendente' %}
+                                                {% if nota.status_nfse == 'pendente' %}
                                                     <span class="badge bg-warning text-dark">Pendente</span>
-                                                {% elif nota.status_rps == 'emitida' %}
+                                                {% elif nota.status_nfse == 'emitida' %}
                                                     <span class="badge bg-success">Emitida</span>
-                                                {% elif nota.status_rps == 'cancelada' %}
+                                                {% elif nota.status_nfse == 'cancelada' %}
                                                     <span class="badge bg-danger">Cancelada</span>
-                                                {% elif nota.status_rps == 'erro' %}
+                                                {% elif nota.status_nfse == 'erro' %}
                                                     <span class="badge bg-danger">Erro</span>
+                                                {% else %}
+                                                    <span class="badge bg-secondary">Sem Status</span>
                                                 {% endif %}
                                             </td>
                                             <td>{{ nota.numero_nfse|default:"-" }}</td>
                                             <td>
-                                                <button class="btn btn-sm btn-info" onclick="verDetalhes({{ nota.id }})" 
-                                                        title="Ver Detalhes">
-                                                    <i class="bi bi-eye"></i>
-                                                </button>
+                                                <div class="btn-group" role="group">
+                                                    <button class="btn btn-sm btn-info" onclick="verDetalhes({{ nota.id }})" 
+                                                            title="Ver Detalhes">
+                                                        <i class="bi bi-eye"></i>
+                                                    </button>
+                                                    {% if nota.status_nfse == 'pendente' or nota.status_nfse == 'erro' %}
+                                                        <a href="{% url 'nfse_nacional:editar_nota' nota.id %}" 
+                                                           class="btn btn-sm btn-warning" 
+                                                           title="Editar Nota">
+                                                            <i class="bi bi-pencil"></i>
+                                                        </a>
+                                                    {% endif %}
+                                                </div>
                                             </td>
                                         </tr>
                                     {% endfor %}
@@ -362,6 +373,95 @@
         </div>
     </div>
 </div>
+
+<!-- Modal de Resultados -->
+<div class="modal fade" id="modalResultados" tabindex="-1" data-bs-backdrop="static" data-bs-keyboard="false">
+    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable" style="max-width: 500px;">
+        <div class="modal-content shadow-lg border-0">
+            <div class="modal-header border-0 pb-0">
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body text-center px-4 pt-0 pb-2">
+                <!-- Ícone e Título -->
+                <div class="mb-3" id="modalResultadosIcone">
+                    <i class="bi bi-check-circle-fill text-success" style="font-size: 3.5rem;"></i>
+                </div>
+                
+                <h4 class="fw-bold mb-3" id="modalResultadosTitle">Operação Concluída</h4>
+                
+                <!-- Estatísticas -->
+                <div class="row g-2 mb-3">
+                    <div class="col-6">
+                        <div class="card border-success">
+                            <div class="card-body py-2">
+                                <h3 class="mb-0 text-success fw-bold" id="modalResultadosEmitidas">0</h3>
+                                <small class="text-muted">Emitidas</small>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <div class="card border-danger">
+                            <div class="card-body py-2">
+                                <h3 class="mb-0 text-danger fw-bold" id="modalResultadosErros">0</h3>
+                                <small class="text-muted">Erros</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Descrição -->
+                <p class="text-muted mb-3" id="modalResultadosDescricao" style="font-size: 0.95rem;">
+                    Processamento concluído com sucesso.
+                </p>
+                
+                <!-- Detalhes (se houver) -->
+                <div id="modalResultadosDetalhesContainer" style="display: none;">
+                    <hr class="my-3">
+                    <div class="text-start">
+                        <h6 class="mb-2">
+                            <i class="bi bi-list-ul"></i> 
+                            Detalhes
+                        </h6>
+                        <div id="modalResultadosDetalhes" style="max-height: 250px; overflow-y: auto;"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer border-0 justify-content-center py-3">
+                <button type="button" class="btn btn-outline-secondary btn-sm px-3" data-bs-dismiss="modal">
+                    Fechar
+                </button>
+                <button type="button" class="btn btn-primary btn-sm px-3" onclick="location.reload()">
+                    <i class="bi bi-arrow-clockwise"></i> Atualizar
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal de Confirmação -->
+<div class="modal fade" id="modalConfirmacao" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered" style="max-width: 400px;">
+        <div class="modal-content shadow-lg border-0">
+            <div class="modal-body text-center p-4">
+                <div class="mb-3">
+                    <i class="bi bi-question-circle-fill text-primary" style="font-size: 3.5rem;"></i>
+                </div>
+                <h5 class="fw-bold mb-3" id="modalConfirmacaoTitle">Confirmar Operação</h5>
+                <p class="text-muted mb-4" id="modalConfirmacaoMensagem">
+                    Deseja continuar com esta operação?
+                </p>
+                <div class="d-grid gap-2">
+                    <button type="button" class="btn btn-primary" id="modalConfirmacaoBtnConfirmar">
+                        <i class="bi bi-check-lg"></i> Confirmar
+                    </button>
+                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
+                        <i class="bi bi-x-lg"></i> Cancelar
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 {% endblock %}
 
 {% block extra_js %}
@@ -386,60 +486,73 @@ function emitirSelecionadas() {
         return;
     }
     
-    if (confirm(`Deseja emitir ${selecionadas.length} nota(s) selecionada(s)?`)) {
-        const form = document.createElement('form');
-        form.method = 'POST';
-        form.action = "{% url 'nfs_sp:emitir_notas' %}";
-        
-        const csrf = document.createElement('input');
-        csrf.type = 'hidden';
-        csrf.name = 'csrfmiddlewaretoken';
-        csrf.value = '{{ csrf_token }}';
-        form.appendChild(csrf);
-        
-        selecionadas.forEach(id => {
-            const input = document.createElement('input');
-            input.type = 'hidden';
-            input.name = 'notas[]';
-            input.value = id;
-            form.appendChild(input);
-        });
-        
-        document.body.appendChild(form);
-        form.submit();
-    }
+    mostrarConfirmacao(
+        'Emitir Notas',
+        `Deseja emitir ${selecionadas.length} nota(s) selecionada(s)?`,
+        function() {
+            const formData = new FormData();
+            formData.append('csrfmiddlewaretoken', '{{ csrf_token }}');
+            selecionadas.forEach(id => formData.append('notas[]', id));
+            
+            fetch("{% url 'nfse_nacional:emitir_notas' %}", {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.log('Dados recebidos:', data);
+                mostrarResultados(data, 'emissao');
+            })
+            .catch(error => {
+                console.error('Erro:', error);
+                alert('Erro ao emitir notas: ' + error);
+            });
+        }
+    );
 }
 
 // Excluir Notas Não Emitidas
 function excluirSelecionadas() {
-    const selecionadas = getNotasSelecionadas('pendente');
+    // Buscar todas as notas selecionadas (sem filtro de status)
+    const checkboxes = document.querySelectorAll('.nota-checkbox:checked');
+    const selecionadas = [];
+    
+    checkboxes.forEach(cb => {
+        const status = cb.dataset.status;
+        // Permitir excluir apenas notas não emitidas (pendente, erro ou vazio)
+        if (!status || status === 'pendente' || status === 'erro' || status === '') {
+            selecionadas.push(cb.value);
+        }
+    });
+    
     if (selecionadas.length === 0) {
-        alert('Selecione pelo menos uma nota pendente para excluir.');
+        alert('Selecione pelo menos uma nota não emitida para excluir.\nApenas notas pendentes, com erro ou sem status podem ser excluídas.');
         return;
     }
     
-    if (confirm(`Deseja excluir ${selecionadas.length} nota(s) pendente(s)?`)) {
-        const form = document.createElement('form');
-        form.method = 'POST';
-        form.action = "{% url 'nfs_sp:excluir_notas' %}";
-        
-        const csrf = document.createElement('input');
-        csrf.type = 'hidden';
-        csrf.name = 'csrfmiddlewaretoken';
-        csrf.value = '{{ csrf_token }}';
-        form.appendChild(csrf);
-        
-        selecionadas.forEach(id => {
-            const input = document.createElement('input');
-            input.type = 'hidden';
-            input.name = 'notas[]';
-            input.value = id;
-            form.appendChild(input);
-        });
-        
-        document.body.appendChild(form);
-        form.submit();
-    }
+    mostrarConfirmacao(
+        'Excluir Notas',
+        `Deseja excluir ${selecionadas.length} nota(s) não emitida(s)? Esta ação não pode ser desfeita.`,
+        function() {
+            const formData = new FormData();
+            formData.append('csrfmiddlewaretoken', '{{ csrf_token }}');
+            selecionadas.forEach(id => formData.append('notas[]', id));
+            
+            fetch("{% url 'nfse_nacional:excluir_notas' %}", {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.log('Dados recebidos:', data);
+                mostrarResultados(data, 'exclusao');
+            })
+            .catch(error => {
+                console.error('Erro:', error);
+                alert('Erro ao excluir notas: ' + error);
+            });
+        }
+    );
 }
 
 // Cancelar Notas Emitidas
@@ -450,28 +563,29 @@ function cancelarSelecionadas() {
         return;
     }
     
-    if (confirm(`Deseja cancelar ${selecionadas.length} nota(s) emitida(s)?`)) {
-        const form = document.createElement('form');
-        form.method = 'POST';
-        form.action = "{% url 'nfs_sp:cancelar_notas' %}";
-        
-        const csrf = document.createElement('input');
-        csrf.type = 'hidden';
-        csrf.name = 'csrfmiddlewaretoken';
-        csrf.value = '{{ csrf_token }}';
-        form.appendChild(csrf);
-        
-        selecionadas.forEach(id => {
-            const input = document.createElement('input');
-            input.type = 'hidden';
-            input.name = 'notas[]';
-            input.value = id;
-            form.appendChild(input);
-        });
-        
-        document.body.appendChild(form);
-        form.submit();
-    }
+    mostrarConfirmacao(
+        'Cancelar Notas',
+        `Deseja cancelar ${selecionadas.length} nota(s) emitida(s)? Esta ação não pode ser desfeita.`,
+        function() {
+            const formData = new FormData();
+            formData.append('csrfmiddlewaretoken', '{{ csrf_token }}');
+            selecionadas.forEach(id => formData.append('notas[]', id));
+            
+            fetch("{% url 'nfse_nacional:cancelar_notas' %}", {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.log('Dados recebidos:', data);
+                mostrarResultados(data, 'cancelamento');
+            })
+            .catch(error => {
+                console.error('Erro:', error);
+                alert('Erro ao cancelar notas: ' + error);
+            });
+        }
+    );
 }
 
 // Salvar PDFs
@@ -520,6 +634,123 @@ function getNotasSelecionadas(status = null) {
 }
 
 // ========== FUNÇÕES PARA NOTA NACIONAL ==========
-// Funções serão implementadas posteriormente
+
+// Função para exibir resultados no modal
+function mostrarResultados(data, tipo = 'emissao') {
+    const modalElement = document.getElementById('modalResultados');
+    if (!modalElement) {
+        console.error('Modal não encontrado');
+        alert(data.mensagem || 'Operação concluída');
+        location.reload();
+        return;
+    }
+    
+    const modal = new bootstrap.Modal(modalElement);
+    const icone = document.getElementById('modalResultadosIcone');
+    const title = document.getElementById('modalResultadosTitle');
+    const descricao = document.getElementById('modalResultadosDescricao');
+    const emitidas = document.getElementById('modalResultadosEmitidas');
+    const erros = document.getElementById('modalResultadosErros');
+    const detalhesContainer = document.getElementById('modalResultadosDetalhesContainer');
+    const detalhes = document.getElementById('modalResultadosDetalhes');
+    
+    // Configurar ícone e título baseado no resultado
+    if (data.sucesso && (data.erros === 0 || !data.erros)) {
+        icone.innerHTML = '<i class="bi bi-check-circle-fill text-success" style="font-size: 3.5rem;"></i>';
+        title.textContent = 'Sucesso!';
+        title.className = 'fw-bold mb-3 text-success';
+    } else if (data.emitidas > 0 || data.excluidas > 0 || data.canceladas > 0) {
+        icone.innerHTML = '<i class="bi bi-exclamation-triangle-fill text-warning" style="font-size: 3.5rem;"></i>';
+        title.textContent = 'Concluído com Avisos';
+        title.className = 'fw-bold mb-3 text-warning';
+    } else {
+        icone.innerHTML = '<i class="bi bi-x-circle-fill text-danger" style="font-size: 3.5rem;"></i>';
+        title.textContent = 'Erro na Operação';
+        title.className = 'fw-bold mb-3 text-danger';
+    }
+    
+    // Estatísticas
+    if (tipo === 'emissao') {
+        emitidas.textContent = data.emitidas || 0;
+        erros.textContent = data.erros || 0;
+        document.querySelector('#modalResultadosEmitidas').parentElement.querySelector('small').textContent = 'Emitidas';
+    } else if (tipo === 'exclusao') {
+        emitidas.textContent = data.excluidas || 0;
+        erros.textContent = 0;
+        document.querySelector('#modalResultadosEmitidas').parentElement.querySelector('small').textContent = 'Excluídas';
+    } else if (tipo === 'cancelamento') {
+        emitidas.textContent = data.canceladas || 0;
+        erros.textContent = data.erros || 0;
+        document.querySelector('#modalResultadosEmitidas').parentElement.querySelector('small').textContent = 'Canceladas';
+    }
+    
+    // Descrição
+    descricao.textContent = data.mensagem || 'Operação concluída.';
+    
+    // Detalhes
+    let detalhesHtml = '';
+    if (data.resultados && data.resultados.length > 0) {
+        detalhesContainer.style.display = 'block';
+        
+        data.resultados.forEach((resultado, index) => {
+            const isErro = !resultado.sucesso;
+            const cardClass = isErro ? 'border-danger' : 'border-success';
+            const headerClass = isErro ? 'bg-danger' : 'bg-success';
+            const iconeClass = isErro ? 'bi-x-circle-fill' : 'bi-check-circle-fill';
+            
+            let tituloNota = resultado.numero_documento || `Nota #${resultado.id || index + 1}`;
+            
+            detalhesHtml += `
+                <div class="card ${cardClass} mb-2">
+                    <div class="card-header ${headerClass} text-white py-2">
+                        <small class="mb-0 fw-bold">
+                            <i class="bi ${iconeClass}"></i> ${tituloNota}
+                        </small>
+                    </div>
+                    <div class="card-body p-2">
+                        ${resultado.tomador ? `
+                            <p class="mb-1" style="font-size: 0.85rem;">
+                                <strong>Tomador:</strong> ${resultado.tomador}
+                            </p>
+                        ` : ''}
+                        
+                        ${resultado.valor ? `
+                            <p class="mb-2" style="font-size: 0.85rem;">
+                                <strong>Valor:</strong> R$ ${resultado.valor.toFixed(2).replace('.', ',')}
+                            </p>
+                        ` : ''}
+                        
+                        ${resultado.mensagem ? `
+                            <div class="alert ${isErro ? 'alert-danger' : 'alert-success'} mb-0 py-2">
+                                <small><strong><i class="bi ${isErro ? 'bi-exclamation-triangle-fill' : 'bi-info-circle-fill'}"></i> ${isErro ? 'Erro' : 'Sucesso'}:</strong></small>
+                                <pre class="mb-0 mt-1" style="white-space: pre-wrap; font-size: 0.8em; background: transparent; border: none; padding: 0;">${resultado.mensagem}</pre>
+                            </div>
+                        ` : ''}
+                    </div>
+                </div>
+            `;
+        });
+    } else {
+        detalhesContainer.style.display = 'none';
+    }
+    
+    detalhes.innerHTML = detalhesHtml;
+    modal.show();
+}
+
+// Função para mostrar modal de confirmação
+function mostrarConfirmacao(titulo, mensagem, callback) {
+    const modal = new bootstrap.Modal(document.getElementById('modalConfirmacao'));
+    document.getElementById('modalConfirmacaoTitle').textContent = titulo;
+    document.getElementById('modalConfirmacaoMensagem').textContent = mensagem;
+    
+    const btnConfirmar = document.getElementById('modalConfirmacaoBtnConfirmar');
+    btnConfirmar.onclick = function() {
+        modal.hide();
+        callback();
+    };
+    
+    modal.show();
+}
 </script>
 {% endblock %}
