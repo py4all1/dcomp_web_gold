@@ -1,0 +1,402 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Cadastro de Empresas - Tax Gold{% endblock %}
+{% block page_title %}Cadastro de Empresas{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- Mensagens -->
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        {% endfor %}
+    {% endif %}
+
+    <!-- Formulário de Cadastro -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">
+                        <i class="bi bi-plus-circle"></i> Nova Empresa
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <form method="post" enctype="multipart/form-data" id="formCadastro">
+                        {% csrf_token %}
+                        
+                        <div class="row">
+                            <div class="col-md-4 mb-3">
+                                <label for="{{ form.cnpj.id_for_label }}" class="form-label">
+                                    {{ form.cnpj.label }} <span class="text-danger">*</span>
+                                </label>
+                                {{ form.cnpj }}
+                                {% if form.cnpj.errors %}
+                                    <div class="text-danger small">{{ form.cnpj.errors }}</div>
+                                {% endif %}
+                            </div>
+                            
+                            <div class="col-md-4 mb-3">
+                                <label for="{{ form.razao_social.id_for_label }}" class="form-label">
+                                    {{ form.razao_social.label }} <span class="text-danger">*</span>
+                                </label>
+                                {{ form.razao_social }}
+                                {% if form.razao_social.errors %}
+                                    <div class="text-danger small">{{ form.razao_social.errors }}</div>
+                                {% endif %}
+                            </div>
+                            
+                            <div class="col-md-4 mb-3">
+                                <label for="{{ form.nome_fantasia.id_for_label }}" class="form-label">
+                                    {{ form.nome_fantasia.label }}
+                                </label>
+                                {{ form.nome_fantasia }}
+                                {% if form.nome_fantasia.errors %}
+                                    <div class="text-danger small">{{ form.nome_fantasia.errors }}</div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-4 mb-3">
+                                <label for="{{ form.inscricao_municipal.id_for_label }}" class="form-label">
+                                    {{ form.inscricao_municipal.label }}
+                                </label>
+                                {{ form.inscricao_municipal }}
+                                {% if form.inscricao_municipal.errors %}
+                                    <div class="text-danger small">{{ form.inscricao_municipal.errors }}</div>
+                                {% endif %}
+                            </div>
+                            
+                            <div class="col-md-4 mb-3">
+                                <label for="{{ form.inscricao_estadual.id_for_label }}" class="form-label">
+                                    {{ form.inscricao_estadual.label }}
+                                </label>
+                                {{ form.inscricao_estadual }}
+                                {% if form.inscricao_estadual.errors %}
+                                    <div class="text-danger small">{{ form.inscricao_estadual.errors }}</div>
+                                {% endif %}
+                            </div>
+                            
+                            <div class="col-md-4 mb-3">
+                                <label for="{{ form.senha_certificado.id_for_label }}" class="form-label">
+                                    {{ form.senha_certificado.label }}
+                                </label>
+                                {{ form.senha_certificado }}
+                                {% if form.senha_certificado.errors %}
+                                    <div class="text-danger small">{{ form.senha_certificado.errors }}</div>
+                                {% endif %}
+                                <small class="form-text text-muted">Senha do certificado digital</small>
+                            </div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <div class="form-check">
+                                    {{ form.tem_procurador }}
+                                    <label class="form-check-label" for="{{ form.tem_procurador.id_for_label }}">
+                                        {{ form.tem_procurador.label }}
+                                    </label>
+                                </div>
+                                {% if form.tem_procurador.errors %}
+                                    <div class="text-danger small">{{ form.tem_procurador.errors }}</div>
+                                {% endif %}
+                            </div>
+                            
+                            <div class="col-md-6 mb-3" id="divProcurador" style="display: none;">
+                                <label for="{{ form.cpf_cnpj_procurador.id_for_label }}" class="form-label">
+                                    {{ form.cpf_cnpj_procurador.label }}
+                                </label>
+                                {{ form.cpf_cnpj_procurador }}
+                                {% if form.cpf_cnpj_procurador.errors %}
+                                    <div class="text-danger small">{{ form.cpf_cnpj_procurador.errors }}</div>
+                                {% endif %}
+                                <small class="form-text text-muted">CPF ou CNPJ do procurador</small>
+                            </div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-12 mb-3">
+                                <label for="{{ form.certificado_pfx.id_for_label }}" class="form-label">
+                                    {{ form.certificado_pfx.label }}
+                                </label>
+                                {{ form.certificado_pfx }}
+                                {% if form.certificado_pfx.errors %}
+                                    <div class="text-danger small">{{ form.certificado_pfx.errors }}</div>
+                                {% endif %}
+                                <small class="form-text text-muted">{{ form.certificado_pfx.help_text }}</small>
+                            </div>
+                        </div>
+                        
+                        <div class="d-flex gap-2">
+                            <button type="button" class="btn btn-success" onclick="gerarModelo()">
+                                <i class="bi bi-file-earmark-arrow-down"></i> Gerar Modelo Excel
+                            </button>
+                            <button type="button" class="btn btn-primary" onclick="confirmarCadastro()">
+                                <i class="bi bi-upload"></i> Cadastrar Empresa
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Tabela de Empresas -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">
+                        <i class="bi bi-building"></i> Empresas Cadastradas
+                    </h5>
+                </div>
+                <div class="card-body">
+                    {% if empresas %}
+                        <div class="table-responsive">
+                            <table class="table table-hover table-striped">
+                                <thead class="table-dark">
+                                    <tr>
+                                        <th>CNPJ</th>
+                                        <th>Razão Social</th>
+                                        <th>Inscrição Municipal</th>
+                                        <th>Procurador</th>
+                                        <th>Certificado</th>
+                                        <th>Validade Cert.</th>
+                                        <th>Status</th>
+                                        <th class="text-center">Ações</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for empresa in empresas %}
+                                        <tr>
+                                            <td>{{ empresa.cnpj_formatado }}</td>
+                                            <td>{{ empresa.razao_social }}</td>
+                                            <td>{{ empresa.inscricao_municipal|default:"-" }}</td>
+                                            <td>
+                                                {% if empresa.tem_procurador %}
+                                                    <span class="badge bg-info">
+                                                        <i class="bi bi-person-check"></i> {{ empresa.cpf_cnpj_procurador }}
+                                                    </span>
+                                                {% else %}
+                                                    <span class="text-muted">-</span>
+                                                {% endif %}
+                                            </td>
+                                            <td>
+                                                {% if empresa.certificado_arquivo %}
+                                                    <span class="badge bg-success">
+                                                        <i class="bi bi-shield-check"></i> Sim
+                                                    </span>
+                                                {% else %}
+                                                    <span class="badge bg-warning text-dark">
+                                                        <i class="bi bi-shield-x"></i> Não
+                                                    </span>
+                                                {% endif %}
+                                            </td>
+                                            <td>
+                                                {% if empresa.certificado_validade %}
+                                                    {{ empresa.certificado_validade|date:"d/m/Y" }}
+                                                    {% if empresa.certificado_vencido %}
+                                                        <span class="badge bg-danger">Vencido</span>
+                                                    {% elif empresa.certificado_proximo_vencimento %}
+                                                        <span class="badge bg-warning text-dark">Próximo ao vencimento</span>
+                                                    {% endif %}
+                                                {% else %}
+                                                    -
+                                                {% endif %}
+                                            </td>
+                                            <td>
+                                                {% if empresa.ativo %}
+                                                    <span class="badge bg-success">
+                                                        <i class="bi bi-check-circle"></i> Ativo
+                                                    </span>
+                                                {% else %}
+                                                    <span class="badge bg-secondary">
+                                                        <i class="bi bi-x-circle"></i> Inativo
+                                                    </span>
+                                                {% endif %}
+                                            </td>
+                                            <td class="text-center">
+                                                <div class="btn-group" role="group">
+                                                    <a href="{% url 'core:editar_empresa' empresa.id %}" 
+                                                       class="btn btn-sm btn-primary" 
+                                                       title="Editar">
+                                                        <i class="bi bi-pencil"></i> Editar
+                                                    </a>
+                                                    <button type="button" class="btn btn-sm btn-danger" 
+                                                            onclick="confirmarExclusao('{{ empresa.id }}', '{{ empresa.razao_social }}')"
+                                                            title="Excluir">
+                                                        <i class="bi bi-trash"></i> Excluir
+                                                    </button>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% else %}
+                        <div class="alert alert-info">
+                            <i class="bi bi-info-circle"></i> Nenhuma empresa cadastrada ainda.
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal de Confirmação de Exclusão -->
+<div class="modal fade" id="modalExcluir" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-danger text-white">
+                <h5 class="modal-title">
+                    <i class="bi bi-exclamation-triangle"></i> Confirmar Exclusão
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <p>Tem certeza que deseja excluir a empresa <strong id="nomeEmpresa"></strong>?</p>
+                <div class="alert alert-danger mb-0">
+                    <i class="bi bi-exclamation-triangle-fill"></i> <strong>ATENÇÃO:</strong>
+                    <ul class="mb-0 mt-2">
+                        <li>Esta ação não pode ser desfeita</li>
+                        <li>O certificado digital será removido</li>
+                        <li><strong>Todas as notas fiscais (NFS-SP, NFTS-SP e NFS-e Nacional) desta empresa serão excluídas permanentemente</strong></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <a href="#" id="btnConfirmarExclusao" class="btn btn-danger">
+                    <i class="bi bi-trash"></i> Excluir
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function confirmarExclusao(empresaId, nomeEmpresa) {
+    document.getElementById('nomeEmpresa').textContent = nomeEmpresa;
+    document.getElementById('btnConfirmarExclusao').href = "{% url 'core:excluir_empresa' 0 %}".replace('0', empresaId);
+    new bootstrap.Modal(document.getElementById('modalExcluir')).show();
+}
+
+// Toggle campo procurador
+document.getElementById('id_tem_procurador').addEventListener('change', function() {
+    const divProcurador = document.getElementById('divProcurador');
+    if (this.checked) {
+        divProcurador.style.display = 'block';
+    } else {
+        divProcurador.style.display = 'none';
+        document.getElementById('id_cpf_cnpj_procurador').value = '';
+    }
+});
+
+// Verifica estado inicial do checkbox
+if (document.getElementById('id_tem_procurador').checked) {
+    document.getElementById('divProcurador').style.display = 'block';
+}
+
+// Máscara para CNPJ
+document.getElementById('id_cnpj').addEventListener('input', function(e) {
+    let value = e.target.value.replace(/\D/g, '');
+    if (value.length <= 14) {
+        // CNPJ: 00.000.000/0000-00
+        value = value.replace(/(\d{2})(\d)/, '$1.$2');
+        value = value.replace(/(\d{3})(\d)/, '$1.$2');
+        value = value.replace(/(\d{3})(\d)/, '$1/$2');
+        value = value.replace(/(\d{4})(\d)/, '$1-$2');
+    }
+    e.target.value = value;
+});
+
+// Máscara para CPF/CNPJ do Procurador
+document.getElementById('id_cpf_cnpj_procurador').addEventListener('input', function(e) {
+    let value = e.target.value.replace(/\D/g, '');
+    
+    if (value.length <= 11) {
+        // CPF: 000.000.000-00
+        value = value.replace(/(\d{3})(\d)/, '$1.$2');
+        value = value.replace(/(\d{3})(\d)/, '$1.$2');
+        value = value.replace(/(\d{3})(\d)/, '$1-$2');
+    } else {
+        // CNPJ: 00.000.000/0000-00
+        value = value.replace(/(\d{2})(\d)/, '$1.$2');
+        value = value.replace(/(\d{3})(\d)/, '$1.$2');
+        value = value.replace(/(\d{3})(\d)/, '$1/$2');
+        value = value.replace(/(\d{4})(\d)/, '$1-$2');
+    }
+    e.target.value = value;
+});
+
+// Função de confirmação antes de cadastrar
+function confirmarCadastro() {
+    const form = document.getElementById('formCadastro');
+    const cnpj = document.getElementById('id_cnpj').value;
+    const razaoSocial = document.getElementById('id_razao_social').value;
+    const certificado = document.getElementById('id_certificado_pfx').files[0];
+    const senha = document.getElementById('id_senha_certificado').value;
+    
+    // Validações básicas
+    if (!cnpj || !razaoSocial) {
+        Swal.fire({
+            icon: 'error',
+            title: 'Campos Obrigatórios',
+            text: 'Por favor, preencha CNPJ e Razão Social.',
+            confirmButtonColor: '#3498db'
+        });
+        return;
+    }
+    
+    if (certificado && !senha) {
+        Swal.fire({
+            icon: 'error',
+            title: 'Senha Necessária',
+            text: 'Por favor, informe a senha do certificado digital.',
+            confirmButtonColor: '#3498db'
+        });
+        return;
+    }
+    
+    // Confirmação
+    Swal.fire({
+        title: 'Confirmar Cadastro',
+        html: `
+            <div class="text-start">
+                <p><strong>CNPJ:</strong> ${cnpj}</p>
+                <p><strong>Razão Social:</strong> ${razaoSocial}</p>
+                ${certificado ? '<p><strong>Certificado:</strong> ✅ Será enviado</p>' : '<p><strong>Certificado:</strong> ❌ Não enviado</p>'}
+            </div>
+        `,
+        icon: 'question',
+        showCancelButton: true,
+        confirmButtonColor: '#3498db',
+        cancelButtonColor: '#95a5a6',
+        confirmButtonText: '<i class="bi bi-check-circle"></i> Confirmar',
+        cancelButtonText: '<i class="bi bi-x-circle"></i> Cancelar'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            // Mostra loading
+            Swal.fire({
+                title: 'Cadastrando...',
+                html: 'Aguarde enquanto processamos o certificado digital.',
+                allowOutsideClick: false,
+                didOpen: () => {
+                    Swal.showLoading();
+                }
+            });
+            form.submit();
+        }
+    });
+}
+</script>
+{% endblock %}

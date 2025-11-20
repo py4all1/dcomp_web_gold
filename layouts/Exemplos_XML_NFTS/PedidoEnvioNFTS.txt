@@ -1,0 +1,32 @@
+<PedidoEnvioNFTS xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://www.prefeitura.sp.gov.br/nfts">
+  <Cabecalho Versao="1" xmlns="">
+    <Remetente>
+      <CPFCNPJ>
+        <CNPJ>99999997000100</CNPJ>
+      </CPFCNPJ>
+    </Remetente>
+  </Cabecalho>
+  <NFTS xmlns="">
+    <TipoDocumento>01</TipoDocumento>
+    <ChaveDocumento>
+      <InscricaoMunicipal>39616924</InscricaoMunicipal>
+    </ChaveDocumento>
+    <DataPrestacao>2019-04-23</DataPrestacao>
+    <StatusNFTS>N</StatusNFTS>
+    <TributacaoNFTS>T</TributacaoNFTS>
+    <ValorServicos>10</ValorServicos>
+    <ValorDeducoes>0</ValorDeducoes>
+    <CodigoServico>1023</CodigoServico>
+    <AliquotaServicos>0</AliquotaServicos>
+    <ISSRetidoTomador>false</ISSRetidoTomador>
+    <Prestador>
+      <CPFCNPJ>
+        <CNPJ>99999998000228</CNPJ>
+      </CPFCNPJ>
+    </Prestador>
+    <RegimeTributacao>0</RegimeTributacao>
+    <Discriminacao>Exemplo pedido NFTS</Discriminacao>
+    <TipoNFTS>1</TipoNFTS>
+    <Assinatura>iPnya72oRe2r/Jq2KloGY0AZHjKYuCnh5YmoHwJx+yRRX+PtuG/D/xQcE818YoCormwHkl/txTTcHNkWUeMeUg3wXTpOgdCc4LOKYvyxWjKFHAmzg9sx9a7FK5g5gK3enCKZf3ccCXs8hOQ/iX9vAvi46xR8vUB4vP23G+N5VId0EKWG4Rcg8LPcPBsz1tKSSdyFGdojttO6RjWynyTQ/SG9TpP/2iMLejuWEKYtFSdYxFg4haMHcUuejN2Ky8EQIS2hz1BeX1+/Ls2J+ubd6lAC5SMQsf2lC+LedZ/eNyjU0V5HBs3e/zk1JKqYpcczDhbSYOGxF27I+GS9p7CBXw==</Assinatura>
+  </NFTS>
+</PedidoEnvioNFTS>

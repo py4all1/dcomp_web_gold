@@ -1,0 +1,6 @@
+# Dependências para NFS-e São Paulo
+requests>=2.32.0
+zeep>=4.3.0
+lxml>=4.6.0
+xmlsec>=1.3.13
+cryptography>=41.0.0

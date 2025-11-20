@@ -1,0 +1,1089 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}NFS-e SP - Tax Gold{% endblock %}
+{% block page_title %}NFS-e São Paulo{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- Mensagens -->
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        {% endfor %}
+    {% endif %}
+
+    <!-- Abas -->
+    <ul class="nav nav-pills mb-4" id="nfsTabs" role="tablist">
+        <li class="nav-item" role="presentation">
+            <button class="nav-link active" id="emitir-tab" data-bs-toggle="pill" data-bs-target="#emitir" 
+                    type="button" role="tab">
+                <i class="bi bi-send-fill"></i> Emitir Notas
+            </button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="emitir-nfts-tab" data-bs-toggle="pill" data-bs-target="#emitir-nfts" 
+                    type="button" role="tab">
+                <i class="bi bi-receipt"></i> Emitir NFTS
+            </button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="consultar-tab" data-bs-toggle="pill" data-bs-target="#consultar" 
+                    type="button" role="tab">
+                <i class="bi bi-search"></i> Consultar Notas
+            </button>
+        </li>
+    </ul>
+
+    <!-- Conteúdo das Abas -->
+    <div class="tab-content" id="nfsTabsContent">
+        
+        <!-- ABA: EMITIR NOTAS -->
+        <div class="tab-pane fade show active" id="emitir" role="tabpanel">
+            
+            <!-- Card de Importação -->
+            <div class="card mb-4">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">
+                        <i class="bi bi-file-earmark-excel"></i> Importação de Planilha
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <form method="post" enctype="multipart/form-data" id="formImportar">
+                        {% csrf_token %}
+                        <input type="hidden" name="acao" value="importar">
+                        
+                        <div class="row">
+                            <div class="col-md-4 mb-3">
+                                <label class="form-label">Empresa Emissora <span class="text-danger">*</span></label>
+                                <select name="empresa_id" class="form-select" required id="empresaSelect">
+                                    <option value="">Selecione a empresa...</option>
+                                    {% for emp in empresas %}
+                                        <option value="{{ emp.id }}">{{ emp.razao_social }} - {{ emp.cnpj_formatado }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            
+                            <div class="col-md-8 mb-3">
+                                <label class="form-label">Arquivo Excel</label>
+                                <input type="file" name="arquivo_excel" class="form-control" accept=".xlsx,.xls" id="arquivoExcel">
+                                <small class="text-muted">Formato aceito: .xlsx ou .xls</small>
+                            </div>
+                        </div>
+                        
+                        <div class="d-flex gap-2">
+                            <button type="button" class="btn btn-success" onclick="gerarModelo()">
+                                <i class="bi bi-file-earmark-arrow-down"></i> Gerar Modelo Excel
+                            </button>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="bi bi-upload"></i> Importar Planilha
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Card de Filtros e Ações -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0">
+                        <i class="bi bi-funnel"></i> Filtros e Ações
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <form method="get" id="formFiltros">
+                        <input type="hidden" name="aba" value="emitir">
+                        <div class="row">
+                            <div class="col-md-3 mb-3">
+                                <label class="form-label">Empresa</label>
+                                <select name="cnpj_contribuinte" class="form-select">
+                                    <option value="">Todas</option>
+                                    {% for emp in empresas %}
+                                        <option value="{{ emp.cnpj }}" {% if cnpj_contribuinte == emp.cnpj %}selected{% endif %}>
+                                            {{ emp.razao_social }}
+                                        </option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            
+                            <div class="col-md-2 mb-3">
+                                <label class="form-label">Período Inicial</label>
+                                <input type="date" name="data_inicio" class="form-control" value="{{ data_inicio }}">
+                            </div>
+                            
+                            <div class="col-md-2 mb-3">
+                                <label class="form-label">Período Final</label>
+                                <input type="date" name="data_fim" class="form-control" value="{{ data_fim }}">
+                            </div>
+                            
+                            <div class="col-md-2 mb-3">
+                                <label class="form-label">Status</label>
+                                <select name="status" class="form-select">
+                                    <option value="">Todos</option>
+                                    <option value="pendente" {% if status == 'pendente' %}selected{% endif %}>Pendente</option>
+                                    <option value="emitida" {% if status == 'emitida' %}selected{% endif %}>Emitida</option>
+                                    <option value="cancelada" {% if status == 'cancelada' %}selected{% endif %}>Cancelada</option>
+                                    <option value="erro" {% if status == 'erro' %}selected{% endif %}>Erro</option>
+                                </select>
+                            </div>
+                            
+                            <div class="col-md-3 mb-3">
+                                <label class="form-label">&nbsp;</label>
+                                <button type="submit" class="btn btn-primary w-100">
+                                    <i class="bi bi-search"></i> Buscar
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                    
+                    <hr>
+                    
+                    <div class="d-flex flex-wrap gap-2">
+                        <button type="button" class="btn btn-success" onclick="emitirSelecionadas()">
+                            <i class="bi bi-send-check"></i> Emitir Selecionadas
+                        </button>
+                        <button type="button" class="btn btn-danger" onclick="excluirSelecionadas()">
+                            <i class="bi bi-trash"></i> Excluir Não Emitidas
+                        </button>
+                        <button type="button" class="btn btn-warning" onclick="cancelarSelecionadas()">
+                            <i class="bi bi-x-circle"></i> Cancelar Emitidas
+                        </button>
+                        <button type="button" class="btn btn-info" onclick="salvarPDFs()">
+                            <i class="bi bi-file-pdf"></i> Salvar PDFs
+                        </button>
+                        <button type="button" class="btn btn-secondary" onclick="gerarRelatorio()">
+                            <i class="bi bi-file-earmark-bar-graph"></i> Relatório
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Card de Notas -->
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">
+                        <i class="bi bi-list-ul"></i> Notas Fiscais
+                        <span class="badge bg-secondary ms-2">{{ notas.count }} nota(s)</span>
+                    </h5>
+                </div>
+                <div class="card-body">
+                    {% if notas %}
+                        <div class="table-responsive">
+                            <table class="table table-hover table-striped" id="tabelaNotas">
+                                <thead class="table-dark">
+                                    <tr>
+                                        <th width="30">
+                                            <input type="checkbox" id="selectAll" onclick="toggleSelectAll()">
+                                        </th>
+                                        <th>ID</th>
+                                        <th>Tomador</th>
+                                        <th>CNPJ/CPF</th>
+                                        <th>Descrição</th>
+                                        <th>Valor Total</th>
+                                        <th>ISS</th>
+                                        <th>Data Emissão</th>
+                                        <th>Status</th>
+                                        <th>NFS-e</th>
+                                        <th>Ações</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for nota in notas %}
+                                        <tr>
+                                            <td>
+                                                <input type="checkbox" class="nota-checkbox" value="{{ nota.id }}" 
+                                                       data-status="{{ nota.status_rps }}">
+                                            </td>
+                                            <td>{{ nota.id }}</td>
+                                            <td>{{ nota.nome_tomador }}</td>
+                                            <td>{{ nota.cnpj_cpf_tomador }}</td>
+                                            <td>{{ nota.descricao|truncatewords:10 }}</td>
+                                            <td>R$ {{ nota.valor_total|floatformat:2 }}</td>
+                                            <td>R$ {{ nota.valor_iss|floatformat:2 }}</td>
+                                            <td>{{ nota.data_emissao|date:"d/m/Y"|default:"-" }}</td>
+                                            <td>
+                                                {% if nota.status_rps == 'pendente' %}
+                                                    <span class="badge bg-warning text-dark">Pendente</span>
+                                                {% elif nota.status_rps == 'emitida' %}
+                                                    <span class="badge bg-success">Emitida</span>
+                                                {% elif nota.status_rps == 'cancelada' %}
+                                                    <span class="badge bg-danger">Cancelada</span>
+                                                {% elif nota.status_rps == 'erro' %}
+                                                    <span class="badge bg-danger">Erro</span>
+                                                {% endif %}
+                                            </td>
+                                            <td>{{ nota.numero_nfse|default:"-" }}</td>
+                                            <td>
+                                                <button class="btn btn-sm btn-info" onclick="verDetalhes({{ nota.id }})" 
+                                                        title="Ver Detalhes">
+                                                    <i class="bi bi-eye"></i>
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% else %}
+                        <div class="alert alert-info">
+                            <i class="bi bi-info-circle"></i> Nenhuma nota encontrada. Importe uma planilha para começar.
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- ABA: EMITIR NFTS (Nota Fiscal do Tomador) -->
+        <div class="tab-pane fade" id="emitir-nfts" role="tabpanel">
+            
+            <div class="alert alert-info mb-4">
+                <i class="bi bi-info-circle"></i> <strong>NFTS - Nota Fiscal do Tomador de Serviços SP:</strong> 
+                Utilize esta aba para declarar serviços tomados (recebidos) pela sua empresa.
+            </div>
+            
+            <!-- Card de Importação NFTS -->
+            <div class="card mb-4">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">
+                        <i class="bi bi-file-earmark-excel"></i> Importação de Planilha NFTS
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <form method="post" enctype="multipart/form-data" id="formImportarNFTS">
+                        {% csrf_token %}
+                        <input type="hidden" name="acao" value="importar_nfts">
+                        
+                        <div class="row">
+                            <div class="col-md-4 mb-3">
+                                <label class="form-label">Empresa Tomadora <span class="text-danger">*</span></label>
+                                <select name="empresa_id" class="form-select" required>
+                                    <option value="">Selecione a empresa...</option>
+                                    {% for emp in empresas %}
+                                        <option value="{{ emp.id }}">{{ emp.razao_social }} - {{ emp.cnpj_formatado }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            
+                            <div class="col-md-8 mb-3">
+                                <label class="form-label">Arquivo Excel</label>
+                                <input type="file" name="arquivo_excel" class="form-control" accept=".xlsx,.xls">
+                                <small class="text-muted">Formato aceito: .xlsx ou .xls</small>
+                            </div>
+                        </div>
+                        
+                        <div class="d-flex gap-2">
+                            <button type="button" class="btn btn-success" onclick="gerarModeloNFTS()">
+                                <i class="bi bi-file-earmark-arrow-down"></i> Gerar Modelo Excel
+                            </button>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="bi bi-upload"></i> Importar Planilha
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Card de Filtros e Ações NFTS -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0">
+                        <i class="bi bi-funnel"></i> Filtros e Ações
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <form method="get" id="formBuscarNFTS">
+                        <input type="hidden" name="aba" value="emitir-nfts">
+                        <div class="row">
+                            <div class="col-md-3 mb-3">
+                                <label class="form-label">Empresa</label>
+                                <select name="cnpj_contribuinte" class="form-select">
+                                    <option value="">Todas</option>
+                                    {% for emp in empresas %}
+                                        <option value="{{ emp.cnpj }}" {% if cnpj_contribuinte == emp.cnpj %}selected{% endif %}>
+                                            {{ emp.razao_social }}
+                                        </option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            
+                            <div class="col-md-2 mb-3">
+                                <label class="form-label">Período Inicial</label>
+                                <input type="date" name="data_inicio" class="form-control" value="{{ data_inicio }}">
+                            </div>
+                            
+                            <div class="col-md-2 mb-3">
+                                <label class="form-label">Período Final</label>
+                                <input type="date" name="data_fim" class="form-control" value="{{ data_fim }}">
+                            </div>
+                            
+                            <div class="col-md-2 mb-3">
+                                <label class="form-label">Status</label>
+                                <select name="status" class="form-select">
+                                    <option value="">Todos</option>
+                                    <option value="pendente" {% if status == 'pendente' %}selected{% endif %}>Pendente</option>
+                                    <option value="emitida" {% if status == 'emitida' %}selected{% endif %}>Emitida</option>
+                                    <option value="cancelada" {% if status == 'cancelada' %}selected{% endif %}>Cancelada</option>
+                                    <option value="erro" {% if status == 'erro' %}selected{% endif %}>Erro</option>
+                                </select>
+                            </div>
+                            
+                            <div class="col-md-3 mb-3">
+                                <label class="form-label">&nbsp;</label>
+                                <button type="submit" class="btn btn-primary w-100">
+                                    <i class="bi bi-search"></i> Buscar
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                    
+                    <hr>
+                    
+                    <div class="d-flex flex-wrap gap-2">
+                        <button type="button" class="btn btn-success" onclick="emitirNFTSSelecionadas()">
+                            <i class="bi bi-send-check"></i> Emitir Selecionadas
+                        </button>
+                        <button type="button" class="btn btn-danger" onclick="excluirNFTSSelecionadas()">
+                            <i class="bi bi-trash"></i> Excluir Não Emitidas
+                        </button>
+                        <button type="button" class="btn btn-warning" onclick="cancelarNFTSSelecionadas()">
+                            <i class="bi bi-x-circle"></i> Cancelar Emitidas
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Card de NFTS -->
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">
+                        <i class="bi bi-list-ul"></i> Notas Fiscais do Tomador (NFTS)
+                        <span class="badge bg-secondary ms-2">{{ notas_nfts.count }} nota(s)</span>
+                    </h5>
+                </div>
+                <div class="card-body">
+                    {% if notas_nfts %}
+                        <div class="table-responsive">
+                            <table class="table table-hover table-striped" id="tabelaNFTS">
+                                <thead class="table-dark">
+                                    <tr>
+                                        <th width="30">
+                                            <input type="checkbox" id="selectAllNFTS" onclick="toggleSelectAllNFTS()">
+                                        </th>
+                                        <th>ID</th>
+                                        <th>Prestador</th>
+                                        <th>CNPJ/CPF</th>
+                                        <th>Descrição</th>
+                                        <th>Valor Total</th>
+                                        <th>ISS</th>
+                                        <th>Data Prestação</th>
+                                        <th>Status</th>
+                                        <th>NFTS</th>
+                                        <th>Ações</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for nota in notas_nfts %}
+                                        <tr>
+                                            <td>
+                                                <input type="checkbox" class="nfts-checkbox" value="{{ nota.id }}" 
+                                                       data-status="{{ nota.status_nfts }}">
+                                            </td>
+                                            <td>{{ nota.id }}</td>
+                                            <td>{{ nota.cidade|default:"-" }}</td>
+                                            <td>{{ nota.cnpj_cpf_prestador }}</td>
+                                            <td>{{ nota.descricao|truncatewords:10 }}</td>
+                                            <td>R$ {{ nota.valor_total|floatformat:2 }}</td>
+                                            <td>R$ {{ nota.valor_iss|floatformat:2 }}</td>
+                                            <td>{{ nota.data_prestacao_servico|date:"d/m/Y" }}</td>
+                                            <td>
+                                                {% if nota.status_nfts == 'pendente' %}
+                                                    <span class="badge bg-warning text-dark">Pendente</span>
+                                                {% elif nota.status_nfts == 'emitida' %}
+                                                    <span class="badge bg-success">Emitida</span>
+                                                {% elif nota.status_nfts == 'cancelada' %}
+                                                    <span class="badge bg-danger">Cancelada</span>
+                                                {% elif nota.status_nfts == 'erro' %}
+                                                    <span class="badge bg-danger">Erro</span>
+                                                {% endif %}
+                                            </td>
+                                            <td>{{ nota.nfts|default:"-" }}</td>
+                                            <td>
+                                                <button class="btn btn-sm btn-info" onclick="verDetalhesNFTS({{ nota.id }})" 
+                                                        title="Ver Detalhes">
+                                                    <i class="bi bi-eye"></i>
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% else %}
+                        <div class="alert alert-info">
+                            <i class="bi bi-info-circle"></i> Nenhuma NFTS encontrada. Importe uma planilha para começar.
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- ABA: CONSULTAR NOTAS -->
+        <div class="tab-pane fade" id="consultar" role="tabpanel">
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">
+                        <i class="bi bi-search"></i> Consultar Notas Recebidas/Emitidas
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <form method="post" id="formConsultar">
+                        {% csrf_token %}
+                        <input type="hidden" name="acao" value="consultar">
+                        
+                        <div class="row">
+                            <div class="col-md-3 mb-3">
+                                <label class="form-label">Empresa</label>
+                                <select name="empresa_consulta" class="form-select">
+                                    <option value="">Selecione...</option>
+                                    {% for emp in empresas %}
+                                        <option value="{{ emp.id }}">{{ emp.razao_social }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            
+                            <div class="col-md-2 mb-3">
+                                <label class="form-label">Período Inicial</label>
+                                <input type="date" name="periodo_inicio" class="form-control">
+                            </div>
+                            
+                            <div class="col-md-2 mb-3">
+                                <label class="form-label">Período Final</label>
+                                <input type="date" name="periodo_fim" class="form-control">
+                            </div>
+                            
+                            <div class="col-md-2 mb-3">
+                                <label class="form-label">Tipo</label>
+                                <select name="tipo_nota" class="form-select">
+                                    <option value="emitidas">Emitidas</option>
+                                    <option value="recebidas">Recebidas</option>
+                                </select>
+                            </div>
+                            
+                            <div class="col-md-3 mb-3">
+                                <label class="form-label">&nbsp;</label>
+                                <div class="d-flex gap-2">
+                                    <button type="submit" class="btn btn-primary flex-fill">
+                                        <i class="bi bi-search"></i> Consultar
+                                    </button>
+                                    <button type="button" class="btn btn-success" onclick="exportarExcel()">
+                                        <i class="bi bi-file-earmark-excel"></i> Excel
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                    
+                    <hr>
+                    
+                    <div class="alert alert-info">
+                        <i class="bi bi-info-circle"></i> A consulta de notas recebidas/emitidas será integrada com a API da Prefeitura de São Paulo.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal de Detalhes -->
+<div class="modal fade" id="modalDetalhes" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title">
+                    <i class="bi bi-file-text"></i> Detalhes da Nota Fiscal
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body" id="modalDetalhesBody">
+                <!-- Conteúdo carregado via AJAX -->
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal de Relatório -->
+<div class="modal fade" id="modalRelatorio" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title">
+                    <i class="bi bi-file-earmark-bar-graph"></i> Gerar Relatório
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form method="post" id="formRelatorio">
+                    {% csrf_token %}
+                    <input type="hidden" name="acao" value="relatorio">
+                    
+                    <div class="mb-3">
+                        <label class="form-label">Tipo de Relatório</label>
+                        <select name="tipo_relatorio" class="form-select">
+                            <option value="sintetico">Sintético</option>
+                            <option value="analitico">Analítico</option>
+                            <option value="financeiro">Financeiro</option>
+                            <option value="tributos">Tributos</option>
+                        </select>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label class="form-label">Formato</label>
+                        <select name="formato" class="form-select">
+                            <option value="pdf">PDF</option>
+                            <option value="excel">Excel</option>
+                        </select>
+                    </div>
+                    
+                    <div class="d-flex gap-2">
+                        <button type="submit" class="btn btn-primary flex-fill">
+                            <i class="bi bi-download"></i> Gerar
+                        </button>
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal de Resultados -->
+<div class="modal fade" id="modalResultados" tabindex="-1" data-bs-backdrop="static" data-bs-keyboard="false">
+    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable" style="max-width: 500px;">
+        <div class="modal-content shadow-lg border-0">
+            <div class="modal-header border-0 pb-0">
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body text-center px-4 pt-0 pb-2">
+                <!-- Ícone e Título -->
+                <div class="mb-3" id="modalResultadosIcone">
+                    <i class="bi bi-check-circle-fill text-success" style="font-size: 3.5rem;"></i>
+                </div>
+                
+                <h4 class="fw-bold mb-3" id="modalResultadosTitle">Operação Concluída</h4>
+                
+                <!-- Estatísticas -->
+                <div class="row g-2 mb-3">
+                    <div class="col-6">
+                        <div class="card border-success">
+                            <div class="card-body py-2">
+                                <h3 class="mb-0 text-success fw-bold" id="modalResultadosEmitidas">0</h3>
+                                <small class="text-muted">Emitidas</small>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <div class="card border-danger">
+                            <div class="card-body py-2">
+                                <h3 class="mb-0 text-danger fw-bold" id="modalResultadosErros">0</h3>
+                                <small class="text-muted">Erros</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Descrição -->
+                <p class="text-muted mb-3" id="modalResultadosDescricao" style="font-size: 0.95rem;">
+                    Processamento concluído com sucesso.
+                </p>
+                
+                <!-- Detalhes de Erros (se houver) -->
+                <div id="modalResultadosDetalhesContainer" style="display: none;">
+                    <hr class="my-3">
+                    <div class="text-start">
+                        <h6 class="mb-2">
+                            <i class="bi bi-exclamation-triangle-fill text-warning"></i> 
+                            Detalhes dos Erros
+                        </h6>
+                        <div id="modalResultadosDetalhes" style="max-height: 250px; overflow-y: auto;"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer border-0 justify-content-center py-3">
+                <button type="button" class="btn btn-outline-secondary btn-sm px-3" data-bs-dismiss="modal">
+                    Fechar
+                </button>
+                <button type="button" class="btn btn-primary btn-sm px-3" onclick="location.reload()">
+                    <i class="bi bi-arrow-clockwise"></i> Atualizar
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal de Confirmação -->
+<div class="modal fade" id="modalConfirmacao" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered" style="max-width: 400px;">
+        <div class="modal-content shadow-lg border-0">
+            <div class="modal-body text-center p-4">
+                <div class="mb-3">
+                    <i class="bi bi-question-circle-fill text-primary" style="font-size: 3.5rem;"></i>
+                </div>
+                <h5 class="fw-bold mb-3" id="modalConfirmacaoTitle">Confirmar Operação</h5>
+                <p class="text-muted mb-4" id="modalConfirmacaoMensagem">
+                    Deseja continuar com esta operação?
+                </p>
+                <div class="d-grid gap-2">
+                    <button type="button" class="btn btn-primary" id="modalConfirmacaoBtnConfirmar">
+                        <i class="bi bi-check-lg"></i> Confirmar
+                    </button>
+                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
+                        <i class="bi bi-x-lg"></i> Cancelar
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// Restaurar aba ativa após reload
+document.addEventListener('DOMContentLoaded', function() {
+    const urlParams = new URLSearchParams(window.location.search);
+    const abaAtiva = urlParams.get('aba');
+    
+    if (abaAtiva) {
+        // Ativar a aba correspondente
+        const tabButton = document.querySelector(`#${abaAtiva}-tab`);
+        if (tabButton) {
+            const tab = new bootstrap.Tab(tabButton);
+            tab.show();
+        }
+    }
+});
+
+// Toggle Select All
+function toggleSelectAll() {
+    const checkboxes = document.querySelectorAll('.nota-checkbox');
+    const selectAll = document.getElementById('selectAll');
+    checkboxes.forEach(cb => cb.checked = selectAll.checked);
+}
+
+// Gerar Modelo Excel
+function gerarModelo() {
+    window.location.href = "{% url 'nfs_sp:gerar_modelo' %}";
+}
+
+// Função para exibir resultados no modal
+function mostrarResultados(data, tipo = 'emissao') {
+    const modalElement = document.getElementById('modalResultados');
+    if (!modalElement) {
+        console.error('Modal não encontrado');
+        alert(data.mensagem || 'Operação concluída');
+        return;
+    }
+    
+    const modal = new bootstrap.Modal(modalElement);
+    const icone = document.getElementById('modalResultadosIcone');
+    const title = document.getElementById('modalResultadosTitle');
+    const descricao = document.getElementById('modalResultadosDescricao');
+    const emitidas = document.getElementById('modalResultadosEmitidas');
+    const erros = document.getElementById('modalResultadosErros');
+    const detalhesContainer = document.getElementById('modalResultadosDetalhesContainer');
+    const detalhes = document.getElementById('modalResultadosDetalhes');
+    
+    // Verificar se todos os elementos existem
+    if (!icone || !title || !descricao || !emitidas || !erros || !detalhes) {
+        console.error('Elementos do modal não encontrados');
+        alert(data.mensagem || 'Operação concluída');
+        return;
+    }
+    
+    // Configurar ícone e título baseado no resultado
+    if (data.erros === 0) {
+        // Sucesso total
+        icone.innerHTML = '<i class="bi bi-check-circle-fill text-success" style="font-size: 3.5rem;"></i>';
+        title.textContent = 'Sucesso!';
+        title.className = 'fw-bold mb-3 text-success';
+    } else if (data.emitidas > 0) {
+        // Sucesso parcial
+        icone.innerHTML = '<i class="bi bi-exclamation-triangle-fill text-warning" style="font-size: 3.5rem;"></i>';
+        title.textContent = 'Concluído com Avisos';
+        title.className = 'fw-bold mb-3 text-warning';
+    } else {
+        // Erro total
+        icone.innerHTML = '<i class="bi bi-x-circle-fill text-danger" style="font-size: 3.5rem;"></i>';
+        title.textContent = 'Erro na Operação';
+        title.className = 'fw-bold mb-3 text-danger';
+    }
+    
+    // Estatísticas
+    if (tipo === 'emissao') {
+        emitidas.textContent = data.emitidas || 0;
+        erros.textContent = data.erros || 0;
+    } else if (tipo === 'cancelamento') {
+        emitidas.textContent = data.canceladas || 0;
+        erros.textContent = data.erros || 0;
+        document.querySelector('#modalResultadosEmitidas').parentElement.querySelector('small').textContent = 'Canceladas';
+    }
+    
+    // Descrição
+    descricao.textContent = data.mensagem || 'Operação concluída.';
+    
+    // Detalhes - Mostrar apenas erros
+    let detalhesHtml = '';
+    const resultadosComErro = data.resultados ? data.resultados.filter(r => !r.sucesso) : [];
+    
+    if (resultadosComErro.length > 0) {
+        detalhesContainer.style.display = 'block';
+        
+        resultadosComErro.forEach((resultado, index) => {
+            const collapseId = `collapse${index}`;
+            
+            // Título do card
+            let tituloNota = '';
+            if (resultado.numero_rps) {
+                tituloNota = `RPS ${resultado.numero_rps}`;
+                if (resultado.serie_rps) {
+                    tituloNota += ` - Série ${resultado.serie_rps}`;
+                }
+            } else {
+                tituloNota = `Nota #${resultado.id || index + 1}`;
+            }
+            
+            detalhesHtml += `
+                <div class="card border-danger mb-2">
+                    <div class="card-header bg-danger text-white py-2">
+                        <small class="mb-0 fw-bold">
+                            <i class="bi bi-x-circle-fill"></i> ${tituloNota}
+                        </small>
+                    </div>
+                    <div class="card-body p-2">
+                        ${resultado.tomador ? `
+                            <p class="mb-1" style="font-size: 0.85rem;">
+                                <strong>Tomador:</strong> ${resultado.tomador}
+                            </p>
+                        ` : ''}
+                        
+                        ${resultado.valor ? `
+                            <p class="mb-2" style="font-size: 0.85rem;">
+                                <strong>Valor:</strong> R$ ${resultado.valor.toFixed(2).replace('.', ',')}
+                            </p>
+                        ` : ''}
+                        
+                        <div class="alert alert-danger mb-0 py-2">
+                            <small><strong><i class="bi bi-exclamation-triangle-fill"></i> Erro:</strong></small>
+                            <pre class="mb-0 mt-1" style="white-space: pre-wrap; font-size: 0.8em; background: transparent; border: none; padding: 0;">${resultado.mensagem}</pre>
+                        </div>
+                    </div>
+                </div>
+            `;
+        });
+    } else {
+        detalhesContainer.style.display = 'none';
+    }
+    
+    detalhes.innerHTML = detalhesHtml;
+    modal.show();
+}
+
+// Função para mostrar modal de confirmação
+function mostrarConfirmacao(titulo, mensagem, callback) {
+    const modal = new bootstrap.Modal(document.getElementById('modalConfirmacao'));
+    document.getElementById('modalConfirmacaoTitle').textContent = titulo;
+    document.getElementById('modalConfirmacaoMensagem').textContent = mensagem;
+    
+    const btnConfirmar = document.getElementById('modalConfirmacaoBtnConfirmar');
+    btnConfirmar.onclick = function() {
+        modal.hide();
+        callback();
+    };
+    
+    modal.show();
+}
+
+// Emitir Notas Selecionadas
+function emitirSelecionadas() {
+    const selecionadas = getNotasSelecionadas();
+    if (selecionadas.length === 0) {
+        alert('Selecione pelo menos uma nota para emitir.');
+        return;
+    }
+    
+    mostrarConfirmacao(
+        'Emitir Notas Fiscais',
+        `Deseja emitir ${selecionadas.length} nota(s) selecionada(s)?`,
+        function() {
+            const formData = new FormData();
+            formData.append('csrfmiddlewaretoken', '{{ csrf_token }}');
+            selecionadas.forEach(id => formData.append('notas[]', id));
+            
+            fetch("{% url 'nfs_sp:emitir_notas' %}", {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.log('Dados recebidos:', data);
+                mostrarResultados(data, 'emissao');
+            })
+            .catch(error => {
+                console.error('Erro:', error);
+                alert('Erro ao emitir notas: ' + error);
+            });
+        }
+    );
+}
+
+// Excluir Notas Não Emitidas
+function excluirSelecionadas() {
+    const selecionadas = getNotasSelecionadas('pendente');
+    if (selecionadas.length === 0) {
+        alert('Selecione pelo menos uma nota pendente para excluir.');
+        return;
+    }
+    
+    if (confirm(`Deseja excluir ${selecionadas.length} nota(s) pendente(s)?`)) {
+        const form = document.createElement('form');
+        form.method = 'POST';
+        form.action = "{% url 'nfs_sp:excluir_notas' %}";
+        
+        const csrf = document.createElement('input');
+        csrf.type = 'hidden';
+        csrf.name = 'csrfmiddlewaretoken';
+        csrf.value = '{{ csrf_token }}';
+        form.appendChild(csrf);
+        
+        selecionadas.forEach(id => {
+            const input = document.createElement('input');
+            input.type = 'hidden';
+            input.name = 'notas[]';
+            input.value = id;
+            form.appendChild(input);
+        });
+        
+        document.body.appendChild(form);
+        form.submit();
+    }
+}
+
+// Cancelar Notas Emitidas
+function cancelarSelecionadas() {
+    const selecionadas = getNotasSelecionadas('emitida');
+    if (selecionadas.length === 0) {
+        alert('Selecione pelo menos uma nota emitida para cancelar.');
+        return;
+    }
+    
+    mostrarConfirmacao(
+        'Cancelar Notas Fiscais',
+        `Deseja cancelar ${selecionadas.length} nota(s) emitida(s)? Esta ação não pode ser desfeita.`,
+        function() {
+            const formData = new FormData();
+            formData.append('csrfmiddlewaretoken', '{{ csrf_token }}');
+            selecionadas.forEach(id => formData.append('notas[]', id));
+            
+            fetch("{% url 'nfs_sp:cancelar_notas' %}", {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                mostrarResultados(data, 'cancelamento');
+            })
+            .catch(error => {
+                alert('Erro ao cancelar notas: ' + error);
+            });
+        }
+    );
+}
+
+// Salvar PDFs
+function salvarPDFs() {
+    const selecionadas = getNotasSelecionadas('emitida');
+    if (selecionadas.length === 0) {
+        alert('Selecione pelo menos uma nota emitida para salvar o PDF.');
+        return;
+    }
+    
+    window.location.href = `{% url 'nfs_sp:salvar_pdfs' %}?notas=${selecionadas.join(',')}`;
+}
+
+// Gerar Relatório
+function gerarRelatorio() {
+    new bootstrap.Modal(document.getElementById('modalRelatorio')).show();
+}
+
+// Ver Detalhes
+function verDetalhes(notaId) {
+    fetch(`{% url 'nfs_sp:detalhes_nota' 0 %}`.replace('0', notaId))
+        .then(response => response.text())
+        .then(html => {
+            document.getElementById('modalDetalhesBody').innerHTML = html;
+            new bootstrap.Modal(document.getElementById('modalDetalhes')).show();
+        });
+}
+
+// Exportar Excel (Consulta)
+function exportarExcel() {
+    alert('Funcionalidade de exportação em desenvolvimento.');
+}
+
+// Helper: Get Notas Selecionadas
+function getNotasSelecionadas(status = null) {
+    const checkboxes = document.querySelectorAll('.nota-checkbox:checked');
+    const ids = [];
+    
+    checkboxes.forEach(cb => {
+        if (!status || cb.dataset.status === status) {
+            ids.push(cb.value);
+        }
+    });
+    
+    return ids;
+}
+
+// ========== FUNÇÕES PARA NFTS ==========
+
+// Toggle Select All NFTS
+function toggleSelectAllNFTS() {
+    const checkboxes = document.querySelectorAll('.nfts-checkbox');
+    const selectAll = document.getElementById('selectAllNFTS');
+    checkboxes.forEach(cb => cb.checked = selectAll.checked);
+}
+
+// Gerar Modelo Excel NFTS
+function gerarModeloNFTS() {
+    window.location.href = "{% url 'nfs_sp:gerar_modelo_nfts' %}";
+}
+
+// Emitir NFTS Selecionadas
+function emitirNFTSSelecionadas() {
+    const selecionadas = getNFTSSelecionadas();
+    if (selecionadas.length === 0) {
+        alert('Selecione pelo menos uma NFTS para emitir.');
+        return;
+    }
+    
+    mostrarConfirmacao(
+        'Emitir NFTS',
+        `Deseja emitir ${selecionadas.length} NFTS selecionada(s)?`,
+        function() {
+            const formData = new FormData();
+            formData.append('csrfmiddlewaretoken', '{{ csrf_token }}');
+            selecionadas.forEach(id => formData.append('notas[]', id));
+            
+            fetch("{% url 'nfs_sp:emitir_nfts' %}", {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.log('Dados recebidos:', data);
+                mostrarResultados(data, 'emissao');
+            })
+            .catch(error => {
+                console.error('Erro:', error);
+                alert('Erro ao emitir NFTS: ' + error);
+            });
+        }
+    );
+}
+
+// Excluir NFTS Não Emitidas
+function excluirNFTSSelecionadas() {
+    const selecionadas = getNFTSSelecionadas('pendente');
+    if (selecionadas.length === 0) {
+        alert('Selecione pelo menos uma NFTS pendente para excluir.');
+        return;
+    }
+    
+    mostrarConfirmacao(
+        'Excluir NFTS',
+        `Deseja excluir ${selecionadas.length} NFTS pendente(s)? Esta ação não pode ser desfeita.`,
+        function() {
+            const form = document.createElement('form');
+            form.method = 'POST';
+            form.action = "{% url 'nfs_sp:excluir_nfts' %}";
+            
+            const csrf = document.createElement('input');
+            csrf.type = 'hidden';
+            csrf.name = 'csrfmiddlewaretoken';
+            csrf.value = '{{ csrf_token }}';
+            form.appendChild(csrf);
+            
+            selecionadas.forEach(id => {
+                const input = document.createElement('input');
+                input.type = 'hidden';
+                input.name = 'notas[]';
+                input.value = id;
+                form.appendChild(input);
+            });
+            
+            document.body.appendChild(form);
+            form.submit();
+        }
+    );
+}
+
+// Cancelar NFTS Emitidas
+function cancelarNFTSSelecionadas() {
+    const selecionadas = getNFTSSelecionadas('emitida');
+    if (selecionadas.length === 0) {
+        alert('Selecione pelo menos uma NFTS emitida para cancelar.');
+        return;
+    }
+    
+    if (confirm(`Deseja cancelar ${selecionadas.length} NFTS emitida(s)?`)) {
+        const form = document.createElement('form');
+        form.method = 'POST';
+        form.action = "{% url 'nfs_sp:cancelar_nfts' %}";
+        
+        const csrf = document.createElement('input');
+        csrf.type = 'hidden';
+        csrf.name = 'csrfmiddlewaretoken';
+        csrf.value = '{{ csrf_token }}';
+        form.appendChild(csrf);
+        
+        selecionadas.forEach(id => {
+            const input = document.createElement('input');
+            input.type = 'hidden';
+            input.name = 'notas[]';
+            input.value = id;
+            form.appendChild(input);
+        });
+        
+        document.body.appendChild(form);
+        form.submit();
+    }
+}
+
+// Ver Detalhes NFTS
+function verDetalhesNFTS(notaId) {
+    fetch(`{% url 'nfs_sp:detalhes_nfts' 0 %}`.replace('0', notaId))
+        .then(response => response.text())
+        .then(html => {
+            document.getElementById('modalDetalhesBody').innerHTML = html;
+            new bootstrap.Modal(document.getElementById('modalDetalhes')).show();
+        });
+}
+
+// Helper: Get NFTS Selecionadas
+function getNFTSSelecionadas(status = null) {
+    const checkboxes = document.querySelectorAll('.nfts-checkbox:checked');
+    const ids = [];
+    
+    checkboxes.forEach(cb => {
+        if (!status || cb.dataset.status === status) {
+            ids.push(cb.value);
+        }
+    });
+    
+    return ids;
+}
+</script>
+{% endblock %}

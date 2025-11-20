@@ -1,0 +1,17 @@
+<PedidoCancelamentoNFTS xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://www.prefeitura.sp.gov.br/nfts">
+  <Cabecalho Versao="1" xmlns="">
+    <Remetente>
+      <CPFCNPJ>
+        <CNPJ>99999997000100</CNPJ>
+      </CPFCNPJ>
+    </Remetente>
+    <transacao>true</transacao>
+  </Cabecalho>
+  <DetalheNFTS xmlns="">
+    <ChaveNFTS>
+      <InscricaoMunicipal>39616924</InscricaoMunicipal>
+      <NumeroNFTS>1076</NumeroNFTS>
+    </ChaveNFTS>
+    <AssinaturaCancelamento>PhDylxqnqTUDNwCksZnwJAknDdEkd2L41r4CjDhh7wS4H5cxOdwNMJXEtxy3rJ5aqIojx/uBg/Z4Acu1TiLp2kOFNhsxIiaWBa7ox28mUw70pM/FPPp1/8qUb7DCd7H7iqa+pj1VVGGlDpFBd1ObN0cWSfaJpuqgc2wZJZHhd3zTKnBmis15PfoXNNvs2Ne0Iy9dTQJUCnyLFy9MMy1jnM0V5uFCa1cAvjjFyVSPfU8UzjbCGvmNzwC7U134g6VwQ5NLb9cvdl4IqbWrywmVn7jn3s5RQPh1ZK/PHGtwa/zmKw6Zp7SJraHj4nbIwkrfDGHTytWwZ7jF7GwHcwbllA==</AssinaturaCancelamento>
+  </DetalheNFTS>
+</PedidoCancelamentoNFTS>

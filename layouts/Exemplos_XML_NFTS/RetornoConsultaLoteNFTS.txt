@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<RetornoConsultaNFTS xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://www.prefeitura.sp.gov.br/nfts">
+  <RetornoConsultaLoteNFTS xmlns="">
+    <NFTS>
+      <TipoDocumento>02</TipoDocumento>
+      <ChaveDocumento>
+        <InscricaoMunicipal>39616924</InscricaoMunicipal>
+        <NumeroDocumento>0</NumeroDocumento>
+      </ChaveDocumento>
+      <ChaveNFTS>
+        <InscricaoMunicipal>39616924</InscricaoMunicipal>
+        <NumeroNFTS>1076</NumeroNFTS>
+        <CodigoVerificacao>IJNFH59E</CodigoVerificacao>
+      </ChaveNFTS>
+      <DataPrestacao>2019-04-23</DataPrestacao>
+      <StatusNFTS>C</StatusNFTS>
+      <TributacaoNFTS>T</TributacaoNFTS>
+      <ValorServicos>10</ValorServicos>
+      <ValorDeducoes>0</ValorDeducoes>
+      <CodigoServico>7</CodigoServico>
+      <CodigoSubItem>2</CodigoSubItem>
+      <AliquotaServicos>0</AliquotaServicos>
+      <ISSRetidoTomador>false</ISSRetidoTomador>
+      <ISSRetidoIntermediario>false</ISSRetidoIntermediario>
+      <Prestador>
+        <CPFCNPJ>
+          <CNPJ>99.999.998/0002-28</CNPJ>
+        </CPFCNPJ>
+        <InscricaoMunicipal>39617106</InscricaoMunicipal>
+        <RazaoSocialPrestador>PESSOA PJ - EPP</RazaoSocialPrestador>
+        <Endereco>
+          <TipoLogradouro>AV</TipoLogradouro>
+          <Logradouro>PAULISTA</Logradouro>
+          <NumeroEndereco>100</NumeroEndereco>
+          <ComplementoEndereco />
+          <Bairro>BELA VISTA</Bairro>
+          <Cidade>São Paulo</Cidade>
+          <UF>SAO PAULO</UF>
+          <CEP>1310100</CEP>
+        </Endereco>
+        <Email>prestador@teste.com.br</Email>
+      </Prestador>
+      <RegimeTributacao>0</RegimeTributacao>
+      <Discriminacao>Exemplo pedido NFTS</Discriminacao>
+    </NFTS>
+  </RetornoConsultaLoteNFTS>
+</RetornoConsultaNFTS>

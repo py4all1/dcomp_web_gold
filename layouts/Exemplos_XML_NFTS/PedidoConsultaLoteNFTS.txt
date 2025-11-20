@@ -1,0 +1,12 @@
+<PedidoConsultaLoteNFTS xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://www.prefeitura.sp.gov.br/nfts">
+  <Cabecalho Versao="1" xmlns="">
+    <Remetente>
+      <CPFCNPJ>
+        <CNPJ>99999997000100</CNPJ>
+      </CPFCNPJ>
+    </Remetente>
+  </Cabecalho>
+  <DetalheLoteNFTS xmlns="">
+    <NumeroLote>9845870</NumeroLote>
+  </DetalheLoteNFTS>
+</PedidoConsultaLoteNFTS>

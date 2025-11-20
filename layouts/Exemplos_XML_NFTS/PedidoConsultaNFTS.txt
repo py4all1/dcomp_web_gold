@@ -1,0 +1,21 @@
+<PedidoConsultaNFTS xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://www.prefeitura.sp.gov.br/nfts">
+  <Cabecalho Versao="1" xmlns="">
+    <Remetente>
+      <CPFCNPJ>
+        <CNPJ>99999997000100</CNPJ>
+      </CPFCNPJ>
+    </Remetente>
+  </Cabecalho>
+  <DetalheNFTS xmlns="">
+    <ChaveNFTS>
+      <InscricaoMunicipal>39616924</InscricaoMunicipal>
+      <NumeroNFTS>1076</NumeroNFTS>
+    </ChaveNFTS>
+  </DetalheNFTS>
+  <DetalheNFTS xmlns="">
+    <ChaveNFTS>
+      <InscricaoMunicipal>39616924</InscricaoMunicipal>
+      <NumeroNFTS>1077</NumeroNFTS>
+    </ChaveNFTS>
+  </DetalheNFTS>
+</PedidoConsultaNFTS>

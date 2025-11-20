@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<RetornoConsultaInformacoesLoteNFTS xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://www.prefeitura.sp.gov.br/nfts">
+  <Cabecalho Versao="1" xmlns="">
+    <Sucesso>true</Sucesso>
+    <InformacoesLoteNFTS>
+      <NumeroLote>0009845870</NumeroLote>
+      <Remetente>
+        <CPFCNPJ>
+          <CNPJ>99.999.997/0001-00</CNPJ>
+        </CPFCNPJ>
+      </Remetente>
+      <dtEnvioLote>2019-04-23T18:40:12</dtEnvioLote>
+      <QtdeNFTSProcessadas>1</QtdeNFTSProcessadas>
+      <TempoProcessamento>1</TempoProcessamento>
+      <ValorTotalServicos>10</ValorTotalServicos>
+    </InformacoesLoteNFTS>
+  </Cabecalho>
+</RetornoConsultaInformacoesLoteNFTS>

@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<RetornoCancelamentoNFTS xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.prefeitura.sp.gov.br/nfts">
+  <Cabecalho Versao="1" xmlns="">
+    <Sucesso>true</Sucesso>
+  </Cabecalho>
+</RetornoCancelamentoNFTS>

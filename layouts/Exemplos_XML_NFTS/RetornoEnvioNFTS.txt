@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<RetornoEnvioNFTS xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://www.prefeitura.sp.gov.br/nfts">
+  <Cabecalho Versao="1" xmlns="">
+    <Sucesso>true</Sucesso>
+  </Cabecalho>
+  <ListaRetornoNFTS xmlns="">
+    <Alerta>
+      <Codigo>456</Codigo>
+      <Descricao>Detalhe: Serviços prestados com dispensa de emissão de documento fiscal por prestadores estabelecidos em São Paulo não devem ser declarados por meio da NFTS.</Descricao>
+    </Alerta>
+  </ListaRetornoNFTS>
+  <ChaveNFTS xmlns="">
+    <InscricaoMunicipal>39616924</InscricaoMunicipal>
+    <NumeroNFTS>1076</NumeroNFTS>
+    <CodigoVerificacao>IJNFH59E</CodigoVerificacao>
+  </ChaveNFTS>
+</RetornoEnvioNFTS>

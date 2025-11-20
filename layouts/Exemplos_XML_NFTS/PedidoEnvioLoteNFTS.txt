@@ -1,0 +1,84 @@
+<PedidoEnvioLoteNFTS xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://www.prefeitura.sp.gov.br/nfts">
+  <Cabecalho Versao="1" xmlns="">
+    <Remetente>
+      <CPFCNPJ>
+        <CNPJ>99999997000100</CNPJ>
+      </CPFCNPJ>
+    </Remetente>
+    <transacao>false</transacao>
+    <dtInicio>2019-04-20</dtInicio>
+    <dtFim>2019-04-23</dtFim>
+    <QtdNFTS>3</QtdNFTS>
+    <ValorTotalServicos>30</ValorTotalServicos>
+    <ValorTotalDeducoes>0</ValorTotalDeducoes>
+  </Cabecalho>
+  <NFTS xmlns="">
+    <TipoDocumento>01</TipoDocumento>
+    <ChaveDocumento>
+      <InscricaoMunicipal>39616924</InscricaoMunicipal>
+    </ChaveDocumento>
+    <DataPrestacao>2019-04-20</DataPrestacao>
+    <StatusNFTS>N</StatusNFTS>
+    <TributacaoNFTS>T</TributacaoNFTS>
+    <ValorServicos>10</ValorServicos>
+    <ValorDeducoes>0</ValorDeducoes>
+    <CodigoServico>1023</CodigoServico>
+    <AliquotaServicos>0</AliquotaServicos>
+    <ISSRetidoTomador>false</ISSRetidoTomador>
+    <Prestador>
+      <CPFCNPJ>
+        <CNPJ>99999998000228</CNPJ>
+      </CPFCNPJ>
+    </Prestador>
+    <RegimeTributacao>0</RegimeTributacao>
+    <Discriminacao>Exemplo pedido NFTS Lote</Discriminacao>
+    <TipoNFTS>1</TipoNFTS>
+    <Assinatura>O83/kL01oWq4YDRcdh4IitPIJaLpaoUYOztRxm6IMcnUNZ2leL2Kv1eHb2vWPUM6p+ma6D2d/5Djr8EhwCXBcJGdkz69/pp0UErhnl4wQ9El2TIgw6+CqKjj2gYLbctWSPiO9ERi8GPLYARjbEFjELU8ll8R95axjHmcFs4V0VtV+j/KmaS+JFuDYqwnfMTj6rknmbb8PRqllRIQdunIVfnYQ28YYGgxFw9BlbTheUhzOQhe4fkjpeO+zKEsVP8Vlzbu3cqv0/z4w5RdWbhoHOPF6Lhx57jVTBBS1WvmxVSTaKNAi6uOiPiOi2lieo2iETqs3z+qp7cIvFHsg7eidQ==</Assinatura>
+  </NFTS>
+  <NFTS xmlns="">
+    <TipoDocumento>01</TipoDocumento>
+    <ChaveDocumento>
+      <InscricaoMunicipal>39616924</InscricaoMunicipal>
+    </ChaveDocumento>
+    <DataPrestacao>2019-04-21</DataPrestacao>
+    <StatusNFTS>N</StatusNFTS>
+    <TributacaoNFTS>T</TributacaoNFTS>
+    <ValorServicos>15</ValorServicos>
+    <ValorDeducoes>0</ValorDeducoes>
+    <CodigoServico>1023</CodigoServico>
+    <AliquotaServicos>0</AliquotaServicos>
+    <ISSRetidoTomador>false</ISSRetidoTomador>
+    <Prestador>
+      <CPFCNPJ>
+        <CNPJ>99999998000228</CNPJ>
+      </CPFCNPJ>
+    </Prestador>
+    <RegimeTributacao>0</RegimeTributacao>
+    <Discriminacao>Exemplo pedido NFTS Lote</Discriminacao>
+    <TipoNFTS>1</TipoNFTS>
+    <Assinatura>BexmK5PqQbxU1EYaGceCpgai9KyMuolM+2vDKB8fjckdHuR7eO2Ab//C8g5TL5EATfCEhPBxszgmhtWKDXhxTw2ajD+Mxx0rEAIBvZQsZsWwSUk+9Sq9dg6Jpea1iaBu+kda5IKH5u994/fDtu1JKWsbJIco1ICIfcq+Kih+U6vWWkftFL+gsJ1u12aivMZptkiZr+iHMSZAlYggh+dT/ouqe2n28NPoHOsBcSBozu8KNF10IqQ4UEKxgMl4kWffT8fApM3Buvxb4pLSAwcMCn9VCFS7ScGYL+Fj9W3OmMnRjJpgdHMzYQNp1c+i+kH3RncIkHsjEmaCKnc0zEyZcQ==</Assinatura>
+  </NFTS>
+  <NFTS xmlns="">
+    <TipoDocumento>01</TipoDocumento>
+    <ChaveDocumento>
+      <InscricaoMunicipal>39616924</InscricaoMunicipal>
+    </ChaveDocumento>
+    <DataPrestacao>2019-04-23</DataPrestacao>
+    <StatusNFTS>N</StatusNFTS>
+    <TributacaoNFTS>T</TributacaoNFTS>
+    <ValorServicos>5</ValorServicos>
+    <ValorDeducoes>0</ValorDeducoes>
+    <CodigoServico>1023</CodigoServico>
+    <AliquotaServicos>0</AliquotaServicos>
+    <ISSRetidoTomador>false</ISSRetidoTomador>
+    <Prestador>
+      <CPFCNPJ>
+        <CNPJ>99999998000228</CNPJ>
+      </CPFCNPJ>
+    </Prestador>
+    <RegimeTributacao>0</RegimeTributacao>
+    <Discriminacao>Exemplo pedido NFTS Lote</Discriminacao>
+    <TipoNFTS>1</TipoNFTS>
+    <Assinatura>ktRhPbFHsLkn93M48eGXY0OilaZhSzWRPZ6WmGYX+AD7V7dlUbHiimpZ2qFZ5XJ+3Fli9mhPoShGSDzKjQOJq++FkRrBWCEbNaOs9iRm2jpVd0BOgI/VFHDCDZJRSbPsEN0pWZFEvD3hUfx0PFoGESIuV5/AeepP+vTpejvEAE5uEXREbAg2Jb3f4xuof4N5BX9GZ39LXB3I4iN7YLOQhkIBJSQYdbW6rdmvFGRjBn7iK/9M03TcIgn2eibdE0E5YMkbeRH3WBQcze4yZdRxQ11RmingOssjb0CLRdNi3ggba9XVhsUDMVoUwipUPRFsKF+wet6yCgmvoZbgpunTkw==</Assinatura>
+  </NFTS>
+</PedidoEnvioLoteNFTS>

@@ -1,0 +1,135 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Início - Emissor Gold{% endblock %}
+{% block page_title %}Início{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- Welcome Section -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="welcome-card">
+                <div class="welcome-content">
+                    <div class="welcome-logo-mobile">
+                        <img src="{% static 'images/logos/logotipo_horizontal_branco.png' %}" alt="Tax Gold Logo">
+                    </div>
+                    <h1>Bem-vindo ao Tax Gold</h1>
+                    <p class="lead">Sistema completo para emissão de notas fiscais de serviço</p>
+                    {% if empresa %}
+                    <div class="empresa-info">
+                        <div class="empresa-info-header">
+                            <i class="bi bi-building-fill"></i>
+                            <h5>{{ empresa.nome_razao }}</h5>
+                        </div>
+                        <div class="empresa-info-details">
+                            <span><i class="bi bi-card-text"></i> {{ empresa.cnpj_cpf }}</span>
+                            <span class="badge badge-gold">
+                                <i class="bi bi-check-circle-fill"></i> {{ empresa.get_status_display }}
+                            </span>
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+                <div class="welcome-logo">
+                    <img src="{% static 'images/logos/logotipo_vertical_preto_nome.png' %}" alt="Tax Gold Logo" class="logo-light">
+                    <img src="{% static 'images/logos/logotipo_vertical_preto_nome.png' %}" alt="Tax Gold Logo" class="logo-dark">
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Quick Actions -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <h3 class="section-title">Ações Rápidas</h3>
+        </div>
+    </div>
+    
+    <div class="row g-4">
+        <div class="col-md-6 col-lg-4">
+            <a href="{% url 'nfs_sp:emitir' %}" class="action-card">
+                <div class="action-icon bg-primary">
+                    <i class="bi bi-file-earmark-text"></i>
+                </div>
+                <div class="action-content">
+                    <h5>NFS-e São Paulo</h5>
+                    <p>Emitir nota fiscal de serviço para São Paulo</p>
+                </div>
+                <i class="bi bi-arrow-right action-arrow"></i>
+            </a>
+        </div>
+        
+        <div class="col-md-6 col-lg-4">
+            <a href="{% url 'nfse_nacional:emitir' %}" class="action-card">
+                <div class="action-icon bg-info">
+                    <i class="bi bi-file-earmark-ruled"></i>
+                </div>
+                <div class="action-content">
+                    <h5>NFS-e Nacional</h5>
+                    <p>Emitir nota fiscal de serviço nacional</p>
+                </div>
+                <i class="bi bi-arrow-right action-arrow"></i>
+            </a>
+        </div>
+        
+        <div class="col-md-6 col-lg-4">
+            <a href="{% url 'core:cadastro' %}" class="action-card">
+                <div class="action-icon bg-warning">
+                    <i class="bi bi-building"></i>
+                </div>
+                <div class="action-content">
+                    <h5>Cadastro</h5>
+                    <p>Gerenciar empresas e dados cadastrais</p>
+                </div>
+                <i class="bi bi-arrow-right action-arrow"></i>
+            </a>
+        </div>
+        
+        <div class="col-md-6 col-lg-4">
+            <a href="{% url 'core:ajuda' %}" class="action-card">
+                <div class="action-icon bg-secondary">
+                    <i class="bi bi-question-circle"></i>
+                </div>
+                <div class="action-content">
+                    <h5>Ajuda</h5>
+                    <p>Suporte e documentação do sistema</p>
+                </div>
+                <i class="bi bi-arrow-right action-arrow"></i>
+            </a>
+        </div>
+    </div>
+    
+    <!-- Info Section -->
+    <div class="row mt-5">
+        <div class="col-12">
+            <div class="info-section">
+                <h3>Sobre o Sistema</h3>
+                <div class="row mt-4">
+                    <div class="col-md-4">
+                        <div class="info-item">
+                            <i class="bi bi-shield-check"></i>
+                            <h5>Segurança</h5>
+                            <p>Sistema seguro com criptografia e proteção de dados</p>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="info-item">
+                            <i class="bi bi-lightning-charge"></i>
+                            <h5>Rapidez</h5>
+                            <p>Emissão rápida e eficiente de notas fiscais</p>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="info-item">
+                            <i class="bi bi-headset"></i>
+                            <h5>Suporte</h5>
+                            <p>Equipe de suporte disponível para ajudá-lo</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

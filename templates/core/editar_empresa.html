@@ -1,0 +1,257 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Editar Empresa - Tax Gold{% endblock %}
+{% block page_title %}Editar Empresa{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2><i class="bi bi-pencil-square"></i> Editar Empresa</h2>
+        <a href="{% url 'core:cadastro' %}" class="btn btn-secondary">
+            <i class="bi bi-arrow-left"></i> Voltar
+        </a>
+    </div>
+
+    <!-- Mensagens -->
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        {% endfor %}
+    {% endif %}
+
+    <!-- Formulário de Edição -->
+    <div class="card">
+        <div class="card-header">
+            <h5 class="mb-0">
+                <i class="bi bi-building"></i> Dados da Empresa: {{ empresa.razao_social }}
+            </h5>
+        </div>
+        <div class="card-body">
+            <form method="post" enctype="multipart/form-data" id="formEmpresa">
+                {% csrf_token %}
+                
+                <div class="row">
+                    <!-- CNPJ -->
+                    <div class="col-md-4 mb-3">
+                        <label class="form-label">CNPJ <span class="text-danger">*</span></label>
+                        {{ form.cnpj }}
+                        {% if form.cnpj.errors %}
+                            <div class="text-danger">{{ form.cnpj.errors }}</div>
+                        {% endif %}
+                    </div>
+                    
+                    <!-- Razão Social -->
+                    <div class="col-md-8 mb-3">
+                        <label class="form-label">Razão Social <span class="text-danger">*</span></label>
+                        {{ form.razao_social }}
+                        {% if form.razao_social.errors %}
+                            <div class="text-danger">{{ form.razao_social.errors }}</div>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <div class="row">
+                    <!-- Nome Fantasia -->
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">Nome Fantasia</label>
+                        {{ form.nome_fantasia }}
+                    </div>
+                    
+                    <!-- Inscrição Municipal -->
+                    <div class="col-md-3 mb-3">
+                        <label class="form-label">Inscrição Municipal</label>
+                        {{ form.inscricao_municipal }}
+                    </div>
+                    
+                    <!-- Inscrição Estadual -->
+                    <div class="col-md-3 mb-3">
+                        <label class="form-label">Inscrição Estadual</label>
+                        {{ form.inscricao_estadual }}
+                    </div>
+                </div>
+
+                <!-- Procurador -->
+                <div class="row">
+                    <div class="col-md-12 mb-3">
+                        <div class="form-check">
+                            {{ form.tem_procurador }}
+                            <label class="form-check-label" for="{{ form.tem_procurador.id_for_label }}">
+                                <i class="bi bi-person-check"></i> Empresa possui procurador
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row" id="divProcurador" style="{% if not form.tem_procurador.value %}display: none;{% endif %}">
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">CPF/CNPJ do Procurador</label>
+                        {{ form.cpf_cnpj_procurador }}
+                        {% if form.cpf_cnpj_procurador.errors %}
+                            <div class="text-danger">{{ form.cpf_cnpj_procurador.errors }}</div>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <hr>
+
+                <!-- Certificado Digital -->
+                <h6 class="mb-3"><i class="bi bi-shield-check"></i> Certificado Digital</h6>
+                
+                {% if empresa.certificado_arquivo %}
+                    <div class="alert alert-info mb-3">
+                        <i class="bi bi-info-circle"></i> 
+                        <strong>Certificado atual:</strong> {{ empresa.certificado_arquivo }}
+                        {% if empresa.certificado_validade %}
+                            | <strong>Validade:</strong> {{ empresa.certificado_validade|date:"d/m/Y" }}
+                        {% endif %}
+                        <br>
+                        <small>Envie um novo arquivo apenas se desejar substituir o certificado atual.</small>
+                    </div>
+                {% endif %}
+
+                <div class="row">
+                    <!-- Senha do Certificado -->
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">Senha do Certificado <span class="text-danger">*</span></label>
+                        {{ form.senha_certificado }}
+                        {% if form.senha_certificado.errors %}
+                            <div class="text-danger">{{ form.senha_certificado.errors }}</div>
+                        {% endif %}
+                    </div>
+                    
+                    <!-- Arquivo do Certificado -->
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">Novo Certificado (.pfx)</label>
+                        {{ form.certificado_pfx }}
+                        <small class="text-muted d-block">Deixe em branco para manter o certificado atual</small>
+                        {% if form.certificado_pfx.errors %}
+                            <div class="text-danger">{{ form.certificado_pfx.errors }}</div>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <div class="d-flex gap-2 mt-4">
+                    <button type="button" class="btn btn-primary" onclick="confirmarEdicao()">
+                        <i class="bi bi-check-circle"></i> Salvar Alterações
+                    </button>
+                    <a href="{% url 'core:cadastro' %}" class="btn btn-secondary">
+                        <i class="bi bi-x-circle"></i> Cancelar
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// Máscara de CNPJ
+document.getElementById('id_cnpj').addEventListener('input', function(e) {
+    let value = e.target.value.replace(/\D/g, '');
+    if (value.length <= 14) {
+        value = value.replace(/^(\d{2})(\d)/, '$1.$2');
+        value = value.replace(/^(\d{2})\.(\d{3})(\d)/, '$1.$2.$3');
+        value = value.replace(/\.(\d{3})(\d)/, '.$1/$2');
+        value = value.replace(/(\d{4})(\d)/, '$1-$2');
+    }
+    e.target.value = value;
+});
+
+// Controle do campo de procurador
+document.getElementById('id_tem_procurador').addEventListener('change', function() {
+    const divProcurador = document.getElementById('divProcurador');
+    if (this.checked) {
+        divProcurador.style.display = 'block';
+    } else {
+        divProcurador.style.display = 'none';
+        document.getElementById('id_cpf_cnpj_procurador').value = '';
+    }
+});
+
+// Máscara CPF/CNPJ do Procurador
+document.getElementById('id_cpf_cnpj_procurador').addEventListener('input', function(e) {
+    let value = e.target.value.replace(/\D/g, '');
+    
+    if (value.length <= 11) {
+        // CPF
+        value = value.replace(/(\d{3})(\d)/, '$1.$2');
+        value = value.replace(/(\d{3})(\d)/, '$1.$2');
+        value = value.replace(/(\d{3})(\d{1,2})$/, '$1-$2');
+    } else {
+        // CNPJ
+        value = value.replace(/^(\d{2})(\d)/, '$1.$2');
+        value = value.replace(/^(\d{2})\.(\d{3})(\d)/, '$1.$2.$3');
+        value = value.replace(/\.(\d{3})(\d)/, '.$1/$2');
+        value = value.replace(/(\d{4})(\d)/, '$1-$2');
+    }
+    
+    e.target.value = value;
+});
+
+// Função de confirmação antes de salvar
+function confirmarEdicao() {
+    const form = document.getElementById('formEmpresa');
+    const cnpj = document.getElementById('id_cnpj').value;
+    const razaoSocial = document.getElementById('id_razao_social').value;
+    const certificado = document.getElementById('id_certificado_pfx').files[0];
+    const senha = document.getElementById('id_senha_certificado').value;
+    
+    // Validações básicas
+    if (!cnpj || !razaoSocial) {
+        Swal.fire({
+            icon: 'error',
+            title: 'Campos Obrigatórios',
+            text: 'Por favor, preencha CNPJ e Razão Social.',
+            confirmButtonColor: '#3498db'
+        });
+        return;
+    }
+    
+    if (certificado && !senha) {
+        Swal.fire({
+            icon: 'error',
+            title: 'Senha Necessária',
+            text: 'Por favor, informe a senha do certificado digital.',
+            confirmButtonColor: '#3498db'
+        });
+        return;
+    }
+    
+    // Confirmação
+    Swal.fire({
+        title: 'Confirmar Alterações',
+        html: `
+            <div class="text-start">
+                <p><strong>CNPJ:</strong> ${cnpj}</p>
+                <p><strong>Razão Social:</strong> ${razaoSocial}</p>
+                ${certificado ? '<p><strong>Novo Certificado:</strong> ✅ Será enviado</p>' : '<p><strong>Certificado:</strong> 📋 Mantido</p>'}
+            </div>
+        `,
+        icon: 'question',
+        showCancelButton: true,
+        confirmButtonColor: '#3498db',
+        cancelButtonColor: '#95a5a6',
+        confirmButtonText: '<i class="bi bi-check-circle"></i> Confirmar',
+        cancelButtonText: '<i class="bi bi-x-circle"></i> Cancelar'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            // Mostra loading
+            Swal.fire({
+                title: 'Salvando...',
+                html: certificado ? 'Aguarde enquanto processamos o novo certificado digital.' : 'Aguarde enquanto salvamos as alterações.',
+                allowOutsideClick: false,
+                didOpen: () => {
+                    Swal.showLoading();
+                }
+            });
+            form.submit();
+        }
+    });
+}
+</script>
+{% endblock %}

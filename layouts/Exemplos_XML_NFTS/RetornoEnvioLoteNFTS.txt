@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<RetornoEnvioLoteNFTS xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://www.prefeitura.sp.gov.br/nfts">
+  <Cabecalho Versao="1" xmlns="">
+    <Sucesso>true</Sucesso>
+    <InformacoesLoteNFTS>
+      <NumeroLote>0009845871</NumeroLote>
+      <Remetente>
+        <CPFCNPJ>
+          <CNPJ>99999997000100</CNPJ>
+        </CPFCNPJ>
+      </Remetente>
+      <dtEnvioLote>2019-04-23T19:07:18.7777419-03:00</dtEnvioLote>
+      <QtdeNFTSProcessadas>3</QtdeNFTSProcessadas>
+      <TempoProcessamento>1</TempoProcessamento>
+      <ValorTotalServicos>30</ValorTotalServicos>
+    </InformacoesLoteNFTS>
+  </Cabecalho>
+  <ListaRetornoLote xmlns="">
+    <Alerta>
+      <Codigo>456</Codigo>
+      <Descricao>Detalhe: Serviços prestados com dispensa de emissão de documento fiscal por prestadores estabelecidos em São Paulo não devem ser declarados por meio da NFTS.</Descricao>
+      <IdentificacaoDocumento>
+        <Posicao>1</Posicao>
+        <ChaveDocumento>
+          <InscricaoMunicipal>39616924</InscricaoMunicipal>
+        </ChaveDocumento>
+      </IdentificacaoDocumento>
+    </Alerta>
+    <Alerta>
+      <Codigo>456</Codigo>
+      <Descricao>Detalhe: Serviços prestados com dispensa de emissão de documento fiscal por prestadores estabelecidos em São Paulo não devem ser declarados por meio da NFTS.</Descricao>
+      <IdentificacaoDocumento>
+        <Posicao>2</Posicao>
+        <ChaveDocumento>
+          <InscricaoMunicipal>39616924</InscricaoMunicipal>
+        </ChaveDocumento>
+      </IdentificacaoDocumento>
+    </Alerta>
+    <Alerta>
+      <Codigo>456</Codigo>
+      <Descricao>Detalhe: Serviços prestados com dispensa de emissão de documento fiscal por prestadores estabelecidos em São Paulo não devem ser declarados por meio da NFTS.</Descricao>
+      <IdentificacaoDocumento>
+        <Posicao>3</Posicao>
+        <ChaveDocumento>
+          <InscricaoMunicipal>39616924</InscricaoMunicipal>
+        </ChaveDocumento>
+      </IdentificacaoDocumento>
+    </Alerta>
+  </ListaRetornoLote>
+</RetornoEnvioLoteNFTS>

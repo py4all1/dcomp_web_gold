@@ -1,0 +1,525 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Emitir NFS-e Nacional - Tax Gold{% endblock %}
+{% block page_title %}NFS-e Nacional{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2><i class="bi bi-file-earmark-ruled"></i> Emissão de NFS-e Nacional</h2>
+        <span class="badge bg-success">Reforma Tributária: IBS e CBS</span>
+    </div>
+
+    <!-- Mensagens -->
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        {% endfor %}
+    {% endif %}
+
+    <!-- Abas -->
+    <ul class="nav nav-pills mb-4" id="nfsTabs" role="tablist">
+        <li class="nav-item" role="presentation">
+            <button class="nav-link active" id="emitir-tab" data-bs-toggle="pill" data-bs-target="#emitir" 
+                    type="button" role="tab">
+                <i class="bi bi-send-fill"></i> Emitir Notas
+            </button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="consultar-tab" data-bs-toggle="pill" data-bs-target="#consultar" 
+                    type="button" role="tab">
+                <i class="bi bi-search"></i> Consultar Notas
+            </button>
+        </li>
+    </ul>
+
+    <!-- Conteúdo das Abas -->
+    <div class="tab-content" id="nfsTabsContent">
+        
+        <!-- ABA: EMITIR NOTAS -->
+        <div class="tab-pane fade show active" id="emitir" role="tabpanel">
+            
+            <!-- Card de Importação -->
+            <div class="card mb-4">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">
+                        <i class="bi bi-file-earmark-excel"></i> Importação de Planilha
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <form method="post" enctype="multipart/form-data" id="formImportar">
+                        {% csrf_token %}
+                        <input type="hidden" name="acao" value="importar">
+                        
+                        <div class="row">
+                            <div class="col-md-4 mb-3">
+                                <label class="form-label">Empresa Emissora <span class="text-danger">*</span></label>
+                                <select name="empresa_id" class="form-select" required id="empresaSelect">
+                                    <option value="">Selecione a empresa...</option>
+                                    {% for emp in empresas %}
+                                        <option value="{{ emp.id }}">{{ emp.razao_social }} - {{ emp.cnpj_formatado }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            
+                            <div class="col-md-8 mb-3">
+                                <label class="form-label">Arquivo Excel</label>
+                                <input type="file" name="arquivo_excel" class="form-control" accept=".xlsx,.xls" id="arquivoExcel">
+                                <small class="text-muted">Formato aceito: .xlsx ou .xls</small>
+                            </div>
+                        </div>
+                        
+                        <div class="d-flex gap-2">
+                            <button type="button" class="btn btn-success" onclick="gerarModelo()">
+                                <i class="bi bi-file-earmark-arrow-down"></i> Gerar Modelo Excel
+                            </button>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="bi bi-upload"></i> Importar Planilha
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Card de Filtros e Ações -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0">
+                        <i class="bi bi-funnel"></i> Filtros e Ações
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <form method="get" id="formFiltros">
+                        <div class="row">
+                            <div class="col-md-3 mb-3">
+                                <label class="form-label">Empresa</label>
+                                <select name="empresa_id" class="form-select">
+                                    <option value="">Todas</option>
+                                    {% for emp in empresas %}
+                                        <option value="{{ emp.id }}" {% if empresa_filtro == emp.id|stringformat:"s" %}selected{% endif %}>
+                                            {{ emp.razao_social }}
+                                        </option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            
+                            <div class="col-md-2 mb-3">
+                                <label class="form-label">Período Inicial</label>
+                                <input type="date" name="data_inicio" class="form-control" value="{{ data_inicio }}">
+                            </div>
+                            
+                            <div class="col-md-2 mb-3">
+                                <label class="form-label">Período Final</label>
+                                <input type="date" name="data_fim" class="form-control" value="{{ data_fim }}">
+                            </div>
+                            
+                            <div class="col-md-2 mb-3">
+                                <label class="form-label">Status</label>
+                                <select name="status" class="form-select">
+                                    <option value="">Todos</option>
+                                    <option value="pendente" {% if status == 'pendente' %}selected{% endif %}>Pendente</option>
+                                    <option value="emitida" {% if status == 'emitida' %}selected{% endif %}>Emitida</option>
+                                    <option value="cancelada" {% if status == 'cancelada' %}selected{% endif %}>Cancelada</option>
+                                    <option value="erro" {% if status == 'erro' %}selected{% endif %}>Erro</option>
+                                </select>
+                            </div>
+                            
+                            <div class="col-md-3 mb-3">
+                                <label class="form-label">&nbsp;</label>
+                                <button type="submit" class="btn btn-primary w-100">
+                                    <i class="bi bi-search"></i> Buscar
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                    
+                    <hr>
+                    
+                    <div class="d-flex flex-wrap gap-2">
+                        <button type="button" class="btn btn-success" onclick="emitirSelecionadas()">
+                            <i class="bi bi-send-check"></i> Emitir Selecionadas
+                        </button>
+                        <button type="button" class="btn btn-danger" onclick="excluirSelecionadas()">
+                            <i class="bi bi-trash"></i> Excluir Não Emitidas
+                        </button>
+                        <button type="button" class="btn btn-warning" onclick="cancelarSelecionadas()">
+                            <i class="bi bi-x-circle"></i> Cancelar Emitidas
+                        </button>
+                        <button type="button" class="btn btn-info" onclick="salvarPDFs()">
+                            <i class="bi bi-file-pdf"></i> Salvar PDFs
+                        </button>
+                        <button type="button" class="btn btn-secondary" onclick="gerarRelatorio()">
+                            <i class="bi bi-file-earmark-bar-graph"></i> Relatório
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Card de Notas -->
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">
+                        <i class="bi bi-list-ul"></i> Notas Fiscais
+                        <span class="badge bg-secondary ms-2">{{ notas.count }} nota(s)</span>
+                    </h5>
+                </div>
+                <div class="card-body">
+                    {% if notas %}
+                        <div class="table-responsive">
+                            <table class="table table-hover table-striped" id="tabelaNotas">
+                                <thead class="table-dark">
+                                    <tr>
+                                        <th width="30">
+                                            <input type="checkbox" id="selectAll" onclick="toggleSelectAll()">
+                                        </th>
+                                        <th>ID</th>
+                                        <th>Tomador</th>
+                                        <th>CNPJ/CPF</th>
+                                        <th>Descrição</th>
+                                        <th>Valor Total</th>
+                                        <th>ISS</th>
+                                        <th>Data Emissão</th>
+                                        <th>Status</th>
+                                        <th>NFS-e</th>
+                                        <th>Ações</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for nota in notas %}
+                                        <tr>
+                                            <td>
+                                                <input type="checkbox" class="nota-checkbox" value="{{ nota.id }}" 
+                                                       data-status="{{ nota.status_rps }}">
+                                            </td>
+                                            <td>{{ nota.id }}</td>
+                                            <td>{{ nota.nome_tomador }}</td>
+                                            <td>{{ nota.cnpj_cpf_tomador }}</td>
+                                            <td>{{ nota.descricao|truncatewords:10 }}</td>
+                                            <td>R$ {{ nota.valor_total|floatformat:2 }}</td>
+                                            <td>R$ {{ nota.valor_iss|floatformat:2 }}</td>
+                                            <td>{{ nota.data_emissao|date:"d/m/Y"|default:"-" }}</td>
+                                            <td>
+                                                {% if nota.status_rps == 'pendente' %}
+                                                    <span class="badge bg-warning text-dark">Pendente</span>
+                                                {% elif nota.status_rps == 'emitida' %}
+                                                    <span class="badge bg-success">Emitida</span>
+                                                {% elif nota.status_rps == 'cancelada' %}
+                                                    <span class="badge bg-danger">Cancelada</span>
+                                                {% elif nota.status_rps == 'erro' %}
+                                                    <span class="badge bg-danger">Erro</span>
+                                                {% endif %}
+                                            </td>
+                                            <td>{{ nota.numero_nfse|default:"-" }}</td>
+                                            <td>
+                                                <button class="btn btn-sm btn-info" onclick="verDetalhes({{ nota.id }})" 
+                                                        title="Ver Detalhes">
+                                                    <i class="bi bi-eye"></i>
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% else %}
+                        <div class="alert alert-info">
+                            <i class="bi bi-info-circle"></i> Nenhuma nota encontrada. Importe uma planilha para começar.
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- ABA: CONSULTAR NOTAS -->
+        <div class="tab-pane fade" id="consultar" role="tabpanel">
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">
+                        <i class="bi bi-search"></i> Consultar Notas Recebidas/Emitidas
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <form method="post" id="formConsultar">
+                        {% csrf_token %}
+                        <input type="hidden" name="acao" value="consultar">
+                        
+                        <div class="row">
+                            <div class="col-md-3 mb-3">
+                                <label class="form-label">Empresa</label>
+                                <select name="empresa_consulta" class="form-select">
+                                    <option value="">Selecione...</option>
+                                    {% for emp in empresas %}
+                                        <option value="{{ emp.id }}">{{ emp.razao_social }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            
+                            <div class="col-md-2 mb-3">
+                                <label class="form-label">Período Inicial</label>
+                                <input type="date" name="periodo_inicio" class="form-control">
+                            </div>
+                            
+                            <div class="col-md-2 mb-3">
+                                <label class="form-label">Período Final</label>
+                                <input type="date" name="periodo_fim" class="form-control">
+                            </div>
+                            
+                            <div class="col-md-2 mb-3">
+                                <label class="form-label">Tipo</label>
+                                <select name="tipo_nota" class="form-select">
+                                    <option value="emitidas">Emitidas</option>
+                                    <option value="recebidas">Recebidas</option>
+                                </select>
+                            </div>
+                            
+                            <div class="col-md-3 mb-3">
+                                <label class="form-label">&nbsp;</label>
+                                <div class="d-flex gap-2">
+                                    <button type="submit" class="btn btn-primary flex-fill">
+                                        <i class="bi bi-search"></i> Consultar
+                                    </button>
+                                    <button type="button" class="btn btn-success" onclick="exportarExcel()">
+                                        <i class="bi bi-file-earmark-excel"></i> Excel
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                    
+                    <hr>
+                    
+                    <div class="alert alert-info">
+                        <i class="bi bi-info-circle"></i> A consulta de notas recebidas/emitidas será integrada com a API da Prefeitura de São Paulo.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal de Detalhes -->
+<div class="modal fade" id="modalDetalhes" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title">
+                    <i class="bi bi-file-text"></i> Detalhes da Nota Fiscal
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body" id="modalDetalhesBody">
+                <!-- Conteúdo carregado via AJAX -->
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal de Relatório -->
+<div class="modal fade" id="modalRelatorio" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title">
+                    <i class="bi bi-file-earmark-bar-graph"></i> Gerar Relatório
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form method="post" id="formRelatorio">
+                    {% csrf_token %}
+                    <input type="hidden" name="acao" value="relatorio">
+                    
+                    <div class="mb-3">
+                        <label class="form-label">Tipo de Relatório</label>
+                        <select name="tipo_relatorio" class="form-select">
+                            <option value="sintetico">Sintético</option>
+                            <option value="analitico">Analítico</option>
+                            <option value="financeiro">Financeiro</option>
+                            <option value="tributos">Tributos</option>
+                        </select>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label class="form-label">Formato</label>
+                        <select name="formato" class="form-select">
+                            <option value="pdf">PDF</option>
+                            <option value="excel">Excel</option>
+                        </select>
+                    </div>
+                    
+                    <div class="d-flex gap-2">
+                        <button type="submit" class="btn btn-primary flex-fill">
+                            <i class="bi bi-download"></i> Gerar
+                        </button>
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// Toggle Select All
+function toggleSelectAll() {
+    const checkboxes = document.querySelectorAll('.nota-checkbox');
+    const selectAll = document.getElementById('selectAll');
+    checkboxes.forEach(cb => cb.checked = selectAll.checked);
+}
+
+// Gerar Modelo Excel
+function gerarModelo() {
+    window.location.href = "{% url 'nfse_nacional:gerar_modelo' %}";
+}
+
+// Emitir Notas Selecionadas
+function emitirSelecionadas() {
+    const selecionadas = getNotasSelecionadas();
+    if (selecionadas.length === 0) {
+        alert('Selecione pelo menos uma nota para emitir.');
+        return;
+    }
+    
+    if (confirm(`Deseja emitir ${selecionadas.length} nota(s) selecionada(s)?`)) {
+        const form = document.createElement('form');
+        form.method = 'POST';
+        form.action = "{% url 'nfs_sp:emitir_notas' %}";
+        
+        const csrf = document.createElement('input');
+        csrf.type = 'hidden';
+        csrf.name = 'csrfmiddlewaretoken';
+        csrf.value = '{{ csrf_token }}';
+        form.appendChild(csrf);
+        
+        selecionadas.forEach(id => {
+            const input = document.createElement('input');
+            input.type = 'hidden';
+            input.name = 'notas[]';
+            input.value = id;
+            form.appendChild(input);
+        });
+        
+        document.body.appendChild(form);
+        form.submit();
+    }
+}
+
+// Excluir Notas Não Emitidas
+function excluirSelecionadas() {
+    const selecionadas = getNotasSelecionadas('pendente');
+    if (selecionadas.length === 0) {
+        alert('Selecione pelo menos uma nota pendente para excluir.');
+        return;
+    }
+    
+    if (confirm(`Deseja excluir ${selecionadas.length} nota(s) pendente(s)?`)) {
+        const form = document.createElement('form');
+        form.method = 'POST';
+        form.action = "{% url 'nfs_sp:excluir_notas' %}";
+        
+        const csrf = document.createElement('input');
+        csrf.type = 'hidden';
+        csrf.name = 'csrfmiddlewaretoken';
+        csrf.value = '{{ csrf_token }}';
+        form.appendChild(csrf);
+        
+        selecionadas.forEach(id => {
+            const input = document.createElement('input');
+            input.type = 'hidden';
+            input.name = 'notas[]';
+            input.value = id;
+            form.appendChild(input);
+        });
+        
+        document.body.appendChild(form);
+        form.submit();
+    }
+}
+
+// Cancelar Notas Emitidas
+function cancelarSelecionadas() {
+    const selecionadas = getNotasSelecionadas('emitida');
+    if (selecionadas.length === 0) {
+        alert('Selecione pelo menos uma nota emitida para cancelar.');
+        return;
+    }
+    
+    if (confirm(`Deseja cancelar ${selecionadas.length} nota(s) emitida(s)?`)) {
+        const form = document.createElement('form');
+        form.method = 'POST';
+        form.action = "{% url 'nfs_sp:cancelar_notas' %}";
+        
+        const csrf = document.createElement('input');
+        csrf.type = 'hidden';
+        csrf.name = 'csrfmiddlewaretoken';
+        csrf.value = '{{ csrf_token }}';
+        form.appendChild(csrf);
+        
+        selecionadas.forEach(id => {
+            const input = document.createElement('input');
+            input.type = 'hidden';
+            input.name = 'notas[]';
+            input.value = id;
+            form.appendChild(input);
+        });
+        
+        document.body.appendChild(form);
+        form.submit();
+    }
+}
+
+// Salvar PDFs
+function salvarPDFs() {
+    const selecionadas = getNotasSelecionadas('emitida');
+    if (selecionadas.length === 0) {
+        alert('Selecione pelo menos uma nota emitida para salvar o PDF.');
+        return;
+    }
+    
+    window.location.href = `{% url 'nfs_sp:salvar_pdfs' %}?notas=${selecionadas.join(',')}`;
+}
+
+// Gerar Relatório
+function gerarRelatorio() {
+    new bootstrap.Modal(document.getElementById('modalRelatorio')).show();
+}
+
+// Ver Detalhes
+function verDetalhes(notaId) {
+    fetch(`{% url 'nfs_sp:detalhes_nota' 0 %}`.replace('0', notaId))
+        .then(response => response.text())
+        .then(html => {
+            document.getElementById('modalDetalhesBody').innerHTML = html;
+            new bootstrap.Modal(document.getElementById('modalDetalhes')).show();
+        });
+}
+
+// Exportar Excel (Consulta)
+function exportarExcel() {
+    alert('Funcionalidade de exportação em desenvolvimento.');
+}
+
+// Helper: Get Notas Selecionadas
+function getNotasSelecionadas(status = null) {
+    const checkboxes = document.querySelectorAll('.nota-checkbox:checked');
+    const ids = [];
+    
+    checkboxes.forEach(cb => {
+        if (!status || cb.dataset.status === status) {
+            ids.push(cb.value);
+        }
+    });
+    
+    return ids;
+}
+
+// ========== FUNÇÕES PARA NOTA NACIONAL ==========
+// Funções serão implementadas posteriormente
+</script>
+{% endblock %}
