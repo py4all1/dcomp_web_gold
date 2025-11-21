@@ -138,3 +138,11 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 LOGIN_URL = 'accounts:login'
 LOGIN_REDIRECT_URL = 'core:home'
 LOGOUT_REDIRECT_URL = 'accounts:login'
+
+# Configurações de Sessão - Logout automático após inatividade
+SESSION_COOKIE_AGE = 900  # 15 minutos (900 segundos)
+SESSION_SAVE_EVERY_REQUEST = True  # Renova a sessão a cada requisição
+SESSION_EXPIRE_AT_BROWSER_CLOSE = True  # Expira ao fechar o navegador
+SESSION_COOKIE_SECURE = False  # True em produção com HTTPS
+SESSION_COOKIE_HTTPONLY = True  # Proteção contra XSS
+SESSION_COOKIE_SAMESITE = 'Lax'  # Proteção contra CSRF
