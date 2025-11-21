@@ -32,6 +32,7 @@ certificados/
 #  before PyInstaller builds the exe, so as to inject date/other infos into it.
 *.manifest
 *.spec
+postgree_cofing.txt
 
 # Installer logs
 pip-log.txt

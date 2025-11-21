@@ -22,14 +22,14 @@
         
         body {
             font-family: 'Inter', sans-serif;
-            background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 50%, #1a1a1a 100%);
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             min-height: 100vh;
             display: flex;
             position: relative;
             overflow-x: hidden;
         }
         
-        /* Animação de fundo com cores Tax Gold */
+        /* Animação de fundo */
         body::before {
             content: '';
             position: absolute;
@@ -38,9 +38,9 @@
             right: 0;
             bottom: 0;
             background: 
-                radial-gradient(circle at 20% 50%, rgba(255, 215, 0, 0.08) 0%, transparent 50%),
-                radial-gradient(circle at 80% 80%, rgba(218, 165, 32, 0.08) 0%, transparent 50%),
-                radial-gradient(circle at 40% 20%, rgba(255, 215, 0, 0.05) 0%, transparent 50%);
+                radial-gradient(circle at 20% 50%, rgba(255, 215, 0, 0.15) 0%, transparent 50%),
+                radial-gradient(circle at 80% 80%, rgba(255, 165, 0, 0.15) 0%, transparent 50%),
+                radial-gradient(circle at 40% 20%, rgba(102, 126, 234, 0.1) 0%, transparent 50%);
             animation: pulse 15s ease-in-out infinite;
             pointer-events: none;
         }
@@ -55,147 +55,79 @@
             width: 100%;
             position: relative;
             z-index: 1;
-            justify-content: center;
-            align-items: center;
-            padding: 2rem;
         }
         
-        /* Modal de Informações (Centralizado) */
+        /* Lado Esquerdo - Informações */
         .left-side {
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%) scale(0.9);
-            width: 90%;
-            max-width: 900px;
-            max-height: 90vh;
-            background: linear-gradient(135deg, #2d2d2d 0%, #3a3a3a 100%);
-            backdrop-filter: blur(20px);
-            padding: 3rem;
+            flex: 1;
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            padding: 4rem;
             display: flex;
             flex-direction: column;
-            justify-content: flex-start;
-            color: #ffffff;
-            border: 3px solid #FFD700;
-            border-radius: 24px;
-            opacity: 0;
-            visibility: hidden;
-            pointer-events: none;
-            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-            z-index: 10002;
-            overflow-y: auto;
-            box-shadow: 0 30px 90px rgba(0, 0, 0, 0.9),
-                        0 0 0 1px rgba(255, 215, 0, 0.5) inset,
-                        0 0 80px rgba(255, 215, 0, 0.3);
-        }
-        
-        .left-side.active {
-            opacity: 1;
-            visibility: visible;
-            pointer-events: auto;
-            transform: translate(-50%, -50%) scale(1);
-        }
-        
-        .left-side::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: linear-gradient(180deg, rgba(255, 215, 0, 0.03) 0%, transparent 100%);
-            pointer-events: none;
-            border-radius: 24px;
-        }
-        
-        /* Conteúdo do modal em grid */
-        .left-side > div {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 2rem;
-            width: 100%;
-        }
-        
-        .left-side > div > * {
-            grid-column: span 2;
-        }
-        
-        .video-section {
-            grid-column: 1 !important;
-        }
-        
-        .features-section {
-            grid-column: 2 !important;
-        }
-        
-        .contact-section {
-            grid-column: span 2 !important;
+            justify-content: space-between;
+            color: white;
+            border-right: 1px solid rgba(255, 255, 255, 0.1);
         }
         
         .logo-section {
-            margin-bottom: 1rem;
-            position: relative;
-            z-index: 1;
-            text-align: center;
+            margin-bottom: 3rem;
         }
         
         .logo-section img {
-            max-width: 280px;
+            max-width: 200px;
             height: auto;
+            filter: brightness(0) invert(1);
             margin-bottom: 1rem;
-            filter: drop-shadow(0 4px 12px rgba(255, 215, 0, 0.3));
         }
         
         .logo-section h1 {
             font-size: 2.5rem;
             font-weight: 800;
-            background: linear-gradient(135deg, #FFD700 0%, #DAA520 100%);
+            background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
             margin-bottom: 0.5rem;
-            text-shadow: 0 2px 10px rgba(255, 215, 0, 0.2);
         }
         
         .logo-section p {
             font-size: 1.1rem;
-            color: #e0e0e0;
-            font-weight: 400;
-            letter-spacing: 0.5px;
+            color: rgba(255, 255, 255, 0.9);
+            font-weight: 300;
         }
         
         /* Vídeo Explicativo */
         .video-section {
-            margin: 2rem 0;
+            margin: 3rem 0;
         }
         
         .video-section h3 {
-            font-size: 1.3rem;
+            font-size: 1.5rem;
             font-weight: 600;
-            margin-bottom: 1rem;
+            margin-bottom: 1.5rem;
             display: flex;
             align-items: center;
             gap: 0.5rem;
-            color: #ffffff;
         }
         
         .video-container {
             position: relative;
             width: 100%;
             padding-bottom: 56.25%; /* 16:9 */
-            background: rgba(0, 0, 0, 0.5);
+            background: rgba(0, 0, 0, 0.3);
             border-radius: 16px;
             overflow: hidden;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
-            border: 2px solid rgba(255, 215, 0, 0.3);
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            border: 2px solid rgba(255, 215, 0, 0.2);
             cursor: pointer;
             transition: all 0.3s;
         }
         
         .video-container:hover {
             transform: translateY(-5px);
-            box-shadow: 0 25px 70px rgba(255, 215, 0, 0.2);
-            border-color: rgba(255, 215, 0, 0.6);
+            box-shadow: 0 25px 70px rgba(0, 0, 0, 0.4);
+            border-color: rgba(255, 215, 0, 0.4);
         }
         
         .video-placeholder {
@@ -208,7 +140,7 @@
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            background: linear-gradient(135deg, rgba(26, 26, 26, 0.8) 0%, rgba(45, 45, 45, 0.8) 100%);
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.3) 0%, rgba(118, 75, 162, 0.3) 100%);
         }
         
         .video-placeholder i {
@@ -227,19 +159,18 @@
             font-size: 1.1rem;
             font-weight: 500;
             margin: 0;
-            color: #ffffff;
         }
         
         /* Features */
         .features-section {
-            margin: 2rem 0;
+            margin: 3rem 0;
         }
         
         .feature-item {
             display: flex;
             align-items: start;
             gap: 1rem;
-            margin-bottom: 1rem;
+            margin-bottom: 1.5rem;
             padding: 1rem;
             background: rgba(255, 255, 255, 0.05);
             border-radius: 12px;
@@ -247,9 +178,8 @@
         }
         
         .feature-item:hover {
-            background: rgba(255, 215, 0, 0.08);
+            background: rgba(255, 255, 255, 0.1);
             transform: translateX(10px);
-            border-left: 3px solid #FFD700;
         }
         
         .feature-item i {
@@ -262,27 +192,25 @@
             font-size: 1rem;
             font-weight: 600;
             margin-bottom: 0.25rem;
-            color: #ffffff;
         }
         
         .feature-item div p {
             font-size: 0.9rem;
-            color: #d0d0d0;
+            color: rgba(255, 255, 255, 0.7);
             margin: 0;
         }
         
         /* Contato */
         .contact-section {
-            margin-top: 2rem;
+            margin-top: auto;
             padding-top: 2rem;
             border-top: 1px solid rgba(255, 255, 255, 0.1);
         }
         
         .contact-section h4 {
-            font-size: 1.1rem;
+            font-size: 1.2rem;
             font-weight: 600;
             margin-bottom: 1rem;
-            color: #ffffff;
         }
         
         .contact-links {
@@ -296,10 +224,10 @@
             align-items: center;
             gap: 0.5rem;
             padding: 0.75rem 1.5rem;
-            background: rgba(255, 255, 255, 0.15);
-            border: 2px solid rgba(255, 215, 0, 0.3);
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
             border-radius: 50px;
-            color: #ffffff;
+            color: white;
             text-decoration: none;
             font-size: 0.9rem;
             font-weight: 500;
@@ -307,116 +235,49 @@
         }
         
         .contact-link:hover {
-            background: linear-gradient(135deg, #FFD700 0%, #DAA520 100%);
+            background: rgba(255, 215, 0, 0.2);
             border-color: #FFD700;
-            color: #1a1a1a;
+            color: white;
             transform: translateY(-2px);
-            box-shadow: 0 5px 20px rgba(255, 215, 0, 0.4);
-            font-weight: 600;
+            box-shadow: 0 5px 15px rgba(255, 215, 0, 0.3);
         }
         
         .contact-link i {
             font-size: 1.1rem;
         }
         
-        /* Botão de Informações */
-        .info-toggle-btn {
-            position: fixed;
-            top: 2rem;
-            left: 2rem;
-            background: linear-gradient(135deg, #FFD700 0%, #DAA520 100%);
-            border: none;
-            border-radius: 12px;
-            padding: 1rem 1.5rem;
-            color: #1a1a1a;
-            font-weight: 600;
-            font-size: 0.95rem;
-            cursor: pointer;
-            transition: all 0.3s;
-            z-index: 10001;
-            box-shadow: 0 4px 15px rgba(255, 215, 0, 0.3);
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-        
-        .info-toggle-btn:hover {
-            background: linear-gradient(135deg, #E6C200 0%, #B8860B 100%);
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(255, 215, 0, 0.5);
-        }
-        
-        .info-toggle-btn.active {
-            z-index: 9999;
-        }
-        
-        .info-toggle-btn.active i {
-            transform: rotate(180deg);
-        }
-        
-        /* Overlay */
-        .overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: transparent;
-            opacity: 0;
-            visibility: hidden;
-            transition: opacity 0.3s, visibility 0.3s;
-            z-index: 10000;
-            pointer-events: none;
-        }
-        
-        .overlay.active {
-            opacity: 0;
-            visibility: hidden;
-            pointer-events: none;
-        }
-        
-        /* Lado Direito - Login (Centralizado) */
+        /* Lado Direito - Login */
         .right-side {
-            max-width: 450px;
-            width: 100%;
+            flex: 0 0 500px;
             background: white;
-            padding: 2.5rem 2.5rem 2rem;
-            border-radius: 20px;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-            position: relative;
-            z-index: 1;
+            padding: 4rem;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            box-shadow: -10px 0 40px rgba(0, 0, 0, 0.1);
         }
         
         .login-card {
+            max-width: 400px;
+            margin: 0 auto;
             width: 100%;
-        }
-        
-        .login-logo {
-            text-align: center;
-            margin-bottom: 1.5rem;
-        }
-        
-        .login-logo img {
-            max-width: 160px;
-            height: auto;
-            margin-bottom: 0.5rem;
         }
         
         .login-header {
             text-align: center;
-            margin-bottom: 1.5rem;
+            margin-bottom: 2.5rem;
         }
         
         .login-header h2 {
-            font-size: 1.5rem;
+            font-size: 2rem;
             font-weight: 700;
             color: #1a1a1a;
-            margin-bottom: 0.25rem;
+            margin-bottom: 0.5rem;
         }
         
         .login-header p {
             color: #6c757d;
-            font-size: 0.9rem;
+            font-size: 1rem;
         }
         
         .form-label {
@@ -427,55 +288,51 @@
         }
         
         .form-control {
-            padding: 0.75rem 1rem;
+            padding: 0.875rem 1rem;
             border-radius: 10px;
             border: 2px solid #e9ecef;
-            font-size: 0.95rem;
+            font-size: 1rem;
             transition: all 0.3s;
         }
         
         .form-control:focus {
-            border-color: #FFD700;
-            box-shadow: 0 0 0 0.2rem rgba(255, 215, 0, 0.15);
+            border-color: #667eea;
+            box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.15);
         }
         
         .btn-login {
             width: 100%;
-            padding: 0.875rem;
-            background: linear-gradient(135deg, #FFD700 0%, #DAA520 100%);
+            padding: 1rem;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             border: none;
             border-radius: 10px;
-            color: #1a1a1a;
-            font-weight: 700;
-            font-size: 0.95rem;
+            color: white;
+            font-weight: 600;
+            font-size: 1rem;
             transition: all 0.3s;
-            margin-top: 1rem;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            box-shadow: 0 4px 15px rgba(255, 215, 0, 0.3);
+            margin-top: 1.5rem;
         }
         
         .btn-login:hover {
-            background: linear-gradient(135deg, #E6C200 0%, #B8860B 100%);
-            transform: translateY(-3px);
-            box-shadow: 0 8px 25px rgba(255, 215, 0, 0.5);
-            color: #000;
+            background: linear-gradient(135deg, #5568d3 0%, #6a3f8f 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.3);
         }
         
         .login-footer {
             text-align: center;
-            margin-top: 1.5rem;
+            margin-top: 2rem;
         }
         
         .login-footer a {
-            color: #DAA520;
+            color: #667eea;
             text-decoration: none;
-            font-weight: 600;
+            font-weight: 500;
             transition: all 0.3s;
         }
         
         .login-footer a:hover {
-            color: #FFD700;
+            color: #764ba2;
             text-decoration: underline;
         }
         
@@ -483,7 +340,7 @@
             display: flex;
             align-items: center;
             text-align: center;
-            margin: 1.25rem 0;
+            margin: 2rem 0;
             color: #6c757d;
         }
         
@@ -506,81 +363,36 @@
             margin-bottom: 1.5rem;
         }
         
-        /* Botão Fechar Modal */
-        .close-sidebar-btn {
-            position: absolute;
-            top: 1.5rem;
-            right: 1.5rem;
-            background: rgba(255, 215, 0, 0.2);
-            border: 2px solid rgba(255, 215, 0, 0.4);
-            border-radius: 50%;
-            width: 45px;
-            height: 45px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: #FFD700;
-            cursor: pointer;
-            transition: all 0.3s;
-            font-size: 1.75rem;
-            z-index: 10;
-        }
-        
-        .close-sidebar-btn:hover {
-            background: rgba(255, 215, 0, 0.4);
-            transform: rotate(90deg) scale(1.1);
-            border-color: #FFD700;
-        }
-        
         /* Responsive */
         @media (max-width: 992px) {
+            .container-fluid {
+                flex-direction: column;
+            }
+            
             .left-side {
-                width: 95%;
-                max-width: 95%;
                 padding: 2rem;
-            }
-            
-            .left-side > div {
-                grid-template-columns: 1fr;
-            }
-            
-            .video-section,
-            .features-section,
-            .contact-section {
-                grid-column: 1 !important;
+                border-right: none;
+                border-bottom: 1px solid rgba(255, 255, 255, 0.1);
             }
             
             .right-side {
+                flex: 1;
                 padding: 2rem;
-                margin: 1rem;
             }
             
-            .info-toggle-btn {
-                top: 1rem;
-                left: 1rem;
-                padding: 0.75rem 1.25rem;
-                font-size: 0.85rem;
+            .video-section {
+                margin: 2rem 0;
             }
         }
         
         @media (max-width: 576px) {
-            .left-side {
-                width: 95%;
-                padding: 1.5rem;
-                max-height: 95vh;
-            }
-            
+            .left-side,
             .right-side {
                 padding: 1.5rem;
-                border-radius: 15px;
             }
             
-            .login-logo img {
-                max-width: 150px;
-            }
-            
-            .login-header h2 {
-                font-size: 1.5rem;
+            .logo-section h1 {
+                font-size: 2rem;
             }
             
             .contact-links {
@@ -590,33 +402,16 @@
             .contact-link {
                 justify-content: center;
             }
-            
-            .info-toggle-btn {
-                padding: 0.6rem 1rem;
-                font-size: 0.8rem;
-            }
-            
-            .close-sidebar-btn {
-                top: 1rem;
-                right: 1rem;
-                width: 40px;
-                height: 40px;
-                font-size: 1.5rem;
-            }
         }
     </style>
 </head>
 <body>
     <div class="container-fluid">
-        <!-- Lado Esquerdo - Informações (Oculto) -->
-        <div class="left-side" id="leftSide">
-            <button class="close-sidebar-btn" onclick="toggleInfo(); event.stopPropagation();">
-                <i class="bi bi-x"></i>
-            </button>
-            
+        <!-- Lado Esquerdo - Informações -->
+        <div class="left-side">
             <div>
                 <div class="logo-section">
-                    <img src="{% static 'images/logos/logotipo_horizontal_branco.png' %}" alt="Tax Gold Logo">
+                    <h1><i class="bi bi-gem"></i> Tax Gold</h1>
                     <p>Sistema Completo de Emissão de Notas Fiscais</p>
                 </div>
                 
@@ -690,14 +485,9 @@
             </div>
         </div>
         
-        <!-- Lado Direito - Login (Centralizado) -->
+        <!-- Lado Direito - Login -->
         <div class="right-side">
             <div class="login-card">
-                <!-- Logo acima do título -->
-                <div class="login-logo">
-                    <img src="{% static 'images/logos/logo_preto.png' %}" alt="Tax Gold Logo">
-                </div>
-                
                 <div class="login-header">
                     <h2>Bem-vindo de volta!</h2>
                     <p>Entre com suas credenciais</p>
@@ -785,28 +575,10 @@
                             <i class="bi bi-person-plus-fill"></i> Cadastre-se gratuitamente
                         </a>
                     </p>
-                    
-                    <div class="mt-4 pt-3" style="border-top: 1px solid #e9ecef;">
-                        <p style="font-size: 0.85rem; color: #6c757d; margin: 0;">
-                            <i class="bi bi-shield-check"></i> Seus dados estão seguros
-                        </p>
-                        <p style="font-size: 0.75rem; color: #adb5bd; margin-top: 0.5rem;">
-                            © 2024 Tax Gold. Todos os direitos reservados.
-                        </p>
-                    </div>
                 </div>
             </div>
         </div>
     </div>
-    
-    <!-- Overlay (deve vir depois do container) -->
-    <div class="overlay" id="overlay"></div>
-    
-    <!-- Botão para abrir informações (deve vir por último) -->
-    <button class="info-toggle-btn" id="infoToggleBtn" onclick="toggleInfo()">
-        <i class="bi bi-info-circle-fill"></i>
-        <span>Sobre o Sistema</span>
-    </button>
     
     <!-- Modal de Vídeo -->
     <div class="modal fade" id="videoModal" tabindex="-1">
@@ -839,34 +611,6 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     
     <script>
-        // Toggle informações laterais
-        function toggleInfo() {
-            const leftSide = document.getElementById('leftSide');
-            const overlay = document.getElementById('overlay');
-            const btn = document.getElementById('infoToggleBtn');
-            
-            leftSide.classList.toggle('active');
-            overlay.classList.toggle('active');
-            btn.classList.toggle('active');
-            
-            // Prevenir scroll do body quando sidebar está aberta
-            if (leftSide.classList.contains('active')) {
-                document.body.style.overflow = 'hidden';
-            } else {
-                document.body.style.overflow = 'auto';
-            }
-        }
-        
-        // Adicionar evento de clique após o DOM carregar
-        document.addEventListener('DOMContentLoaded', function() {
-            const leftSide = document.getElementById('leftSide');
-            
-            // Prevenir que cliques no modal fechem ele
-            leftSide.addEventListener('click', function(e) {
-                e.stopPropagation();
-            });
-        });
-        
         // Abrir modal de vídeo
         function openVideoModal() {
             const videoModal = new bootstrap.Modal(document.getElementById('videoModal'));
