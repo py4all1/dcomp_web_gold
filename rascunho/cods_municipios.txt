@@ -1,0 +1,9 @@
+| Município      | UF | Código IBGE |
+| -------------- | -- | ----------- |
+| São Paulo      | SP | **3550308** |
+| Rio de Janeiro | RJ | **3304557** |
+| Belo Horizonte | MG | **3106200** |
+| Salvador       | BA | **2927408** |
+| Curitiba       | PR | **4106902** |
+| Porto Alegre   | RS | **4314902** |
+| Manaus         | AM | **1302603** |
