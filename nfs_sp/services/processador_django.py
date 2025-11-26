@@ -195,25 +195,34 @@ class ProcessadorNFeDjango:
                 logger = logging.getLogger(__name__)
                 logger.info(f"NFS-e emitida - Número: {resultado.get('numero_nfe')}, Código: {resultado.get('codigo_verificacao')}")
                 
+                # Define namespace
+                namespace = {'nfe': 'http://www.prefeitura.sp.gov.br/nfe'}
+                
                 # Verifica alertas
                 alertas = root.findall('.//Alerta')
                 if not alertas:
-                    namespace = {'nfe': 'http://www.prefeitura.sp.gov.br/nfe'}
                     alertas = root.findall('.//nfe:Alerta', namespace)
                 if alertas:
                     resultado['alertas'] = []
                     for alerta in alertas:
-                        codigo = alerta.find('.//Codigo', namespace)
-                        descricao = alerta.find('.//Descricao', namespace)
+                        codigo = alerta.find('.//Codigo')
+                        if codigo is None:
+                            codigo = alerta.find('.//nfe:Codigo', namespace)
+                        descricao = alerta.find('.//Descricao')
+                        if descricao is None:
+                            descricao = alerta.find('.//nfe:Descricao', namespace)
                         resultado['alertas'].append({
                             'codigo': codigo.text if codigo is not None else '',
                             'descricao': descricao.text if descricao is not None else ''
                         })
             else:
+                # Define namespace se ainda não foi definido
+                if 'namespace' not in locals():
+                    namespace = {'nfe': 'http://www.prefeitura.sp.gov.br/nfe'}
+                
                 # Extrai erros
                 erros = root.findall('.//Erro')
                 if not erros:
-                    namespace = {'nfe': 'http://www.prefeitura.sp.gov.br/nfe'}
                     erros = root.findall('.//nfe:Erro', namespace)
                 
                 if erros:
