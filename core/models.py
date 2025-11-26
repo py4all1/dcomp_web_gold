@@ -33,7 +33,9 @@ class Empresa(models.Model):
     
     empresa_contratante = models.ForeignKey(
         EmpresaContratante,
-        on_delete=models.CASCADE,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
         related_name='empresas_emissoras',
         verbose_name='Empresa Contratante',
         help_text='Empresa que contratou o sistema'
@@ -181,7 +183,9 @@ class NotaFiscalSP(models.Model):
     
     empresa = models.ForeignKey(
         Empresa,
-        on_delete=models.CASCADE,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
         related_name='notas_fiscais',
         verbose_name='Empresa Prestadora'
     )
@@ -298,7 +302,9 @@ class NotaFiscalTomadorSP(models.Model):
     
     empresa = models.ForeignKey(
         Empresa,
-        on_delete=models.CASCADE,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
         related_name='notas_tomador',
         verbose_name='Empresa Tomadora'
     )

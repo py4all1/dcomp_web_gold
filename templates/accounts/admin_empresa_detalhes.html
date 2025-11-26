@@ -1,0 +1,409 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ empresa.nome_razao }} - Detalhes - Tax Gold{% endblock %}
+
+{% block extra_css %}
+<style>
+    :root {
+        --gold: #FFD700;
+        --dark-gold: #DAA520;
+        --dark: #1a1a1a;
+    }
+    
+    .detail-header {
+        background: linear-gradient(135deg, var(--dark) 0%, #2d2d2d 100%);
+        color: white;
+        padding: 2rem 0;
+        margin-bottom: 2rem;
+        border-bottom: 3px solid var(--gold);
+    }
+    
+    .detail-card {
+        background: white;
+        border-radius: 12px;
+        padding: 2rem;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        margin-bottom: 2rem;
+    }
+    
+    .detail-card h4 {
+        font-weight: 700;
+        color: var(--dark);
+        margin-bottom: 1.5rem;
+        padding-bottom: 0.75rem;
+        border-bottom: 2px solid var(--gold);
+    }
+    
+    .info-row {
+        display: flex;
+        padding: 0.75rem 0;
+        border-bottom: 1px solid #f0f0f0;
+    }
+    
+    .info-row:last-child {
+        border-bottom: none;
+    }
+    
+    .info-label {
+        font-weight: 600;
+        color: #6c757d;
+        min-width: 200px;
+    }
+    
+    .info-value {
+        color: var(--dark);
+        font-weight: 500;
+    }
+    
+    .btn-gold {
+        background: linear-gradient(135deg, var(--gold) 0%, var(--dark-gold) 100%);
+        border: none;
+        color: var(--dark);
+        font-weight: 600;
+        padding: 0.6rem 1.5rem;
+        border-radius: 8px;
+        transition: all 0.3s;
+    }
+    
+    .btn-gold:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 15px rgba(255, 215, 0, 0.4);
+        color: var(--dark);
+    }
+    
+    .status-badge {
+        padding: 0.4rem 0.8rem;
+        border-radius: 20px;
+        font-size: 0.9rem;
+        font-weight: 600;
+        display: inline-block;
+    }
+    
+    .status-badge.ativo { background: #d4edda; color: #155724; }
+    .status-badge.teste { background: #fff3cd; color: #856404; }
+    .status-badge.bloqueado { background: #f8d7da; color: #721c24; }
+    
+    .table-custom {
+        background: white;
+        border-radius: 12px;
+        overflow: hidden;
+    }
+    
+    .table-custom thead {
+        background: linear-gradient(135deg, var(--dark) 0%, #2d2d2d 100%);
+        color: white;
+    }
+    
+    .table-custom th {
+        font-weight: 600;
+        padding: 1rem;
+    }
+    
+    .table-custom td {
+        padding: 1rem;
+        vertical-align: middle;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="detail-header">
+    <div class="container">
+        <div class="d-flex justify-content-between align-items-center">
+            <div>
+                <h1 class="mb-2">
+                    <i class="bi bi-building-fill"></i>
+                    {{ empresa.nome_razao }}
+                </h1>
+                <p class="text-white-50 mb-0">Detalhes da empresa contratante</p>
+            </div>
+            <a href="{% url 'accounts:admin_empresas' %}" class="btn btn-gold">
+                <i class="bi bi-arrow-left"></i>
+                Voltar
+            </a>
+        </div>
+    </div>
+</div>
+
+<div class="container">
+    <!-- Informações Gerais -->
+    <div class="detail-card">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h4 class="mb-0">
+                <i class="bi bi-info-circle-fill text-primary"></i>
+                Informações Gerais
+            </h4>
+            <button class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#editarModal">
+                <i class="bi bi-pencil-fill"></i>
+                Editar
+            </button>
+        </div>
+        
+        <div class="info-row">
+            <div class="info-label">Razão Social / Nome:</div>
+            <div class="info-value">{{ empresa.nome_razao }}</div>
+        </div>
+        <div class="info-row">
+            <div class="info-label">CNPJ/CPF:</div>
+            <div class="info-value">{{ empresa.cnpj_cpf }}</div>
+        </div>
+        <div class="info-row">
+            <div class="info-label">Status:</div>
+            <div class="info-value">
+                <span class="status-badge {{ empresa.status }}">{{ empresa.get_status_display }}</span>
+            </div>
+        </div>
+        <div class="info-row">
+            <div class="info-label">Plano:</div>
+            <div class="info-value">{{ empresa.get_plano_display }}</div>
+        </div>
+        <div class="info-row">
+            <div class="info-label">Limite de Usuários:</div>
+            <div class="info-value">{{ empresa.num_usuarios }} usuários</div>
+        </div>
+        <div class="info-row">
+            <div class="info-label">Limite de Empresas:</div>
+            <div class="info-value">{{ empresa.num_empresas }} empresas</div>
+        </div>
+        <div class="info-row">
+            <div class="info-label">Vencimento:</div>
+            <div class="info-value">
+                {% if empresa.vencimento %}
+                    {{ empresa.vencimento|date:"d/m/Y" }}
+                    {% if dias_vencimento < 0 %}
+                        <span class="badge bg-danger">Vencido há {{ dias_vencimento_abs }} dias</span>
+                    {% elif dias_vencimento <= 7 %}
+                        <span class="badge bg-warning">Vence em {{ dias_vencimento }} dias</span>
+                    {% else %}
+                        <span class="badge bg-success">{{ dias_vencimento }} dias restantes</span>
+                    {% endif %}
+                {% else %}
+                    <span class="text-muted">Não definido</span>
+                {% endif %}
+            </div>
+        </div>
+        {% if empresa.observacoes %}
+        <div class="info-row">
+            <div class="info-label">Observações:</div>
+            <div class="info-value">{{ empresa.observacoes }}</div>
+        </div>
+        {% endif %}
+    </div>
+
+    <!-- Ações Rápidas -->
+    <div class="detail-card">
+        <h4>
+            <i class="bi bi-lightning-fill text-warning"></i>
+            Ações Rápidas
+        </h4>
+        <div class="d-flex gap-2 flex-wrap">
+            <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#renovarModal">
+                <i class="bi bi-calendar-plus-fill"></i>
+                Renovar Vencimento
+            </button>
+            
+            <form method="post" action="{% url 'accounts:admin_empresa_toggle_status' empresa.id %}" style="display: inline;">
+                {% csrf_token %}
+                {% if empresa.status == 'bloqueado' %}
+                    <button type="submit" class="btn btn-primary" onclick="return confirm('Deseja ATIVAR esta empresa?')">
+                        <i class="bi bi-unlock-fill"></i>
+                        Ativar Empresa
+                    </button>
+                {% else %}
+                    <button type="submit" class="btn btn-danger" onclick="return confirm('Deseja BLOQUEAR esta empresa?')">
+                        <i class="bi bi-lock-fill"></i>
+                        Bloquear Empresa
+                    </button>
+                {% endif %}
+            </form>
+        </div>
+    </div>
+
+    <!-- Usuários -->
+    <div class="detail-card">
+        <h4>
+            <i class="bi bi-people-fill text-info"></i>
+            Usuários ({{ usuarios.count }}/{{ empresa.num_usuarios }})
+        </h4>
+        
+        {% if usuarios %}
+        <div class="table-responsive">
+            <table class="table table-custom">
+                <thead>
+                    <tr>
+                        <th>Nome</th>
+                        <th>Username</th>
+                        <th>E-mail</th>
+                        <th>Telefone</th>
+                        <th>Data Cadastro</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for usuario in usuarios %}
+                    <tr>
+                        <td>{{ usuario.nome }}</td>
+                        <td>{{ usuario.user.username }}</td>
+                        <td>{{ usuario.user.email }}</td>
+                        <td>{{ usuario.telefone }}</td>
+                        <td>{{ usuario.data_cadastro|date:"d/m/Y H:i" }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <p class="text-muted">Nenhum usuário cadastrado</p>
+        {% endif %}
+    </div>
+
+    <!-- Empresas Emissoras -->
+    <div class="detail-card">
+        <h4>
+            <i class="bi bi-building text-success"></i>
+            Empresas Emissoras ({{ empresas_emissoras.count }}/{{ empresa.num_empresas }})
+        </h4>
+        
+        {% if empresas_emissoras %}
+        <div class="table-responsive">
+            <table class="table table-custom">
+                <thead>
+                    <tr>
+                        <th>Razão Social</th>
+                        <th>CNPJ</th>
+                        <th>Inscrição Municipal</th>
+                        <th>Status</th>
+                        <th>Data Cadastro</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for emp in empresas_emissoras %}
+                    <tr>
+                        <td>{{ emp.razao_social }}</td>
+                        <td>{{ emp.cnpj_formatado }}</td>
+                        <td>{{ emp.inscricao_municipal|default:"-" }}</td>
+                        <td>
+                            {% if emp.ativo %}
+                                <span class="badge bg-success">Ativa</span>
+                            {% else %}
+                                <span class="badge bg-secondary">Inativa</span>
+                            {% endif %}
+                        </td>
+                        <td>{{ emp.data_cadastro|date:"d/m/Y" }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <p class="text-muted">Nenhuma empresa emissora cadastrada</p>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Modal Editar -->
+<div class="modal fade" id="editarModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Editar Empresa</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form method="post" action="{% url 'accounts:admin_empresa_editar' empresa.id %}">
+                {% csrf_token %}
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Razão Social / Nome</label>
+                            <input type="text" name="nome_razao" class="form-control" value="{{ empresa.nome_razao }}" required>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">CNPJ/CPF</label>
+                            <input type="text" name="cnpj_cpf" class="form-control" value="{{ empresa.cnpj_cpf }}" required>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Status</label>
+                            <select name="status" class="form-select" required>
+                                <option value="teste" {% if empresa.status == 'teste' %}selected{% endif %}>Em Teste</option>
+                                <option value="ativo" {% if empresa.status == 'ativo' %}selected{% endif %}>Ativo</option>
+                                <option value="bloqueado" {% if empresa.status == 'bloqueado' %}selected{% endif %}>Bloqueado</option>
+                                <option value="vencido" {% if empresa.status == 'vencido' %}selected{% endif %}>Vencido</option>
+                                <option value="expirado" {% if empresa.status == 'expirado' %}selected{% endif %}>Expirado</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Plano</label>
+                            <select name="plano" class="form-select" required>
+                                <option value="padrao" {% if empresa.plano == 'padrao' %}selected{% endif %}>Padrão</option>
+                                <option value="pro" {% if empresa.plano == 'pro' %}selected{% endif %}>Pro</option>
+                            </select>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label class="form-label">Limite de Usuários</label>
+                            <input type="number" name="num_usuarios" class="form-control" value="{{ empresa.num_usuarios }}" min="1" required>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label class="form-label">Limite de Empresas</label>
+                            <input type="number" name="num_empresas" class="form-control" value="{{ empresa.num_empresas }}" min="1" required>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label class="form-label">Vencimento</label>
+                            <input type="date" name="vencimento" class="form-control" value="{{ empresa.vencimento|date:'Y-m-d' }}">
+                        </div>
+                        <div class="col-12 mb-3">
+                            <label class="form-label">Observações</label>
+                            <textarea name="observacoes" class="form-control" rows="3">{{ empresa.observacoes }}</textarea>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-gold">Salvar Alterações</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Renovar -->
+<div class="modal fade" id="renovarModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Renovar Vencimento</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form method="post" action="{% url 'accounts:admin_empresa_renovar' empresa.id %}">
+                {% csrf_token %}
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label">Adicionar Dias</label>
+                        <select name="dias" class="form-select" required>
+                            <option value="7">7 dias</option>
+                            <option value="15">15 dias</option>
+                            <option value="30" selected>30 dias (1 mês)</option>
+                            <option value="60">60 dias (2 meses)</option>
+                            <option value="90">90 dias (3 meses)</option>
+                            <option value="180">180 dias (6 meses)</option>
+                            <option value="365">365 dias (1 ano)</option>
+                        </select>
+                    </div>
+                    <div class="alert alert-info">
+                        <i class="bi bi-info-circle-fill"></i>
+                        O vencimento será renovado a partir de 
+                        {% if empresa.vencimento and empresa.vencimento > today %}
+                            <strong>{{ empresa.vencimento|date:"d/m/Y" }}</strong>
+                        {% else %}
+                            <strong>hoje</strong>
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-success">Renovar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -84,7 +84,7 @@ class EmpresaContratante(models.Model):
 
 class UserProfile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='profile')
-    empresa = models.ForeignKey(EmpresaContratante, on_delete=models.CASCADE, related_name='usuarios', null=True, blank=True)
+    empresa = models.ForeignKey(EmpresaContratante, on_delete=models.SET_NULL, related_name='usuarios', null=True, blank=True)
     nome = models.CharField('Nome Completo', max_length=255)
     # cnpj_empresa removido - usar empresa.cnpj_cpf
     # nome_empresa removido - usar empresa.nome_razao

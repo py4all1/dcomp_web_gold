@@ -16,7 +16,9 @@ class NotaFiscalNacional(models.Model):
     
     empresa = models.ForeignKey(
         Empresa,
-        on_delete=models.CASCADE,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
         related_name='notas_nacionais',
         verbose_name='Empresa Emissora'
     )

@@ -1,0 +1,421 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Administração de Empresas - Tax Gold{% endblock %}
+
+{% block extra_css %}
+<style>
+    :root {
+        --gold: #FFD700;
+        --dark-gold: #DAA520;
+        --dark: #1a1a1a;
+        --light-gray: #f8f9fa;
+    }
+    
+    .admin-header {
+        background: linear-gradient(135deg, var(--dark) 0%, #2d2d2d 100%);
+        color: white;
+        padding: 2rem 0;
+        margin-bottom: 2rem;
+        border-bottom: 3px solid var(--gold);
+    }
+    
+    .admin-title {
+        font-size: 2rem;
+        font-weight: 700;
+        margin-bottom: 0.5rem;
+        background: linear-gradient(135deg, var(--gold) 0%, var(--dark-gold) 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+    }
+    
+    .stats-card {
+        background: white;
+        border-radius: 12px;
+        padding: 1.5rem;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        transition: all 0.3s;
+        border-left: 4px solid var(--gold);
+    }
+    
+    .stats-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+    }
+    
+    .stats-icon {
+        width: 50px;
+        height: 50px;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.5rem;
+        margin-bottom: 1rem;
+    }
+    
+    .stats-icon.total { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; }
+    .stats-icon.ativas { background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%); color: white; }
+    .stats-icon.teste { background: linear-gradient(135deg, #FFD700 0%, #DAA520 100%); color: white; }
+    .stats-icon.bloqueadas { background: linear-gradient(135deg, #ee0979 0%, #ff6a00 100%); color: white; }
+    
+    .stats-number {
+        font-size: 2rem;
+        font-weight: 700;
+        color: var(--dark);
+        margin-bottom: 0.25rem;
+    }
+    
+    .stats-label {
+        color: #6c757d;
+        font-size: 0.9rem;
+        font-weight: 500;
+    }
+    
+    .filter-card {
+        background: white;
+        border-radius: 12px;
+        padding: 1.5rem;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        margin-bottom: 2rem;
+    }
+    
+    .empresa-card {
+        background: white;
+        border-radius: 12px;
+        padding: 1.5rem;
+        margin-bottom: 1rem;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        transition: all 0.3s;
+        border-left: 4px solid transparent;
+    }
+    
+    .empresa-card:hover {
+        transform: translateX(5px);
+        box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+    }
+    
+    .empresa-card.ativo { border-left-color: #28a745; }
+    .empresa-card.teste { border-left-color: #ffc107; }
+    .empresa-card.bloqueado { border-left-color: #dc3545; }
+    .empresa-card.vencido { border-left-color: #fd7e14; }
+    
+    .status-badge {
+        padding: 0.4rem 0.8rem;
+        border-radius: 20px;
+        font-size: 0.85rem;
+        font-weight: 600;
+        display: inline-block;
+    }
+    
+    .status-badge.ativo { background: #d4edda; color: #155724; }
+    .status-badge.teste { background: #fff3cd; color: #856404; }
+    .status-badge.bloqueado { background: #f8d7da; color: #721c24; }
+    .status-badge.vencido { background: #ffeaa7; color: #d63031; }
+    .status-badge.expirado { background: #e0e0e0; color: #424242; }
+    
+    .plano-badge {
+        padding: 0.4rem 0.8rem;
+        border-radius: 20px;
+        font-size: 0.85rem;
+        font-weight: 600;
+        background: linear-gradient(135deg, var(--gold) 0%, var(--dark-gold) 100%);
+        color: var(--dark);
+    }
+    
+    .btn-gold {
+        background: linear-gradient(135deg, var(--gold) 0%, var(--dark-gold) 100%);
+        border: none;
+        color: var(--dark);
+        font-weight: 600;
+        padding: 0.6rem 1.5rem;
+        border-radius: 8px;
+        transition: all 0.3s;
+    }
+    
+    .btn-gold:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 15px rgba(255, 215, 0, 0.4);
+        color: var(--dark);
+    }
+    
+    .btn-action {
+        padding: 0.5rem 1rem;
+        border-radius: 8px;
+        font-size: 0.9rem;
+        font-weight: 600;
+        transition: all 0.3s;
+        border: none;
+    }
+    
+    .btn-action.ativar {
+        background: #28a745;
+        color: white;
+    }
+    
+    .btn-action.bloquear {
+        background: #dc3545;
+        color: white;
+    }
+    
+    .btn-action:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+    }
+    
+    .empresa-info {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 1rem;
+    }
+    
+    .empresa-dados h5 {
+        font-size: 1.2rem;
+        font-weight: 700;
+        color: var(--dark);
+        margin-bottom: 0.5rem;
+    }
+    
+    .empresa-dados p {
+        color: #6c757d;
+        margin-bottom: 0.25rem;
+        font-size: 0.9rem;
+    }
+    
+    .empresa-stats {
+        display: flex;
+        gap: 2rem;
+    }
+    
+    .stat-item {
+        text-align: center;
+    }
+    
+    .stat-item .number {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: var(--dark);
+    }
+    
+    .stat-item .label {
+        font-size: 0.8rem;
+        color: #6c757d;
+        text-transform: uppercase;
+    }
+    
+    .vencimento-info {
+        padding: 0.5rem 1rem;
+        border-radius: 8px;
+        font-size: 0.9rem;
+        font-weight: 600;
+    }
+    
+    .vencimento-info.vencido {
+        background: #f8d7da;
+        color: #721c24;
+    }
+    
+    .vencimento-info.proximo {
+        background: #fff3cd;
+        color: #856404;
+    }
+    
+    .vencimento-info.ok {
+        background: #d4edda;
+        color: #155724;
+    }
+    
+    .search-box {
+        position: relative;
+    }
+    
+    .search-box input {
+        padding-left: 2.5rem;
+        border-radius: 8px;
+        border: 2px solid #e0e0e0;
+    }
+    
+    .search-box input:focus {
+        border-color: var(--gold);
+        box-shadow: 0 0 0 0.2rem rgba(255, 215, 0, 0.15);
+    }
+    
+    .search-box i {
+        position: absolute;
+        left: 1rem;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #6c757d;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="admin-header">
+    <div class="container">
+        <div class="d-flex justify-content-between align-items-center">
+            <div>
+                <h1 class="admin-title">
+                    <i class="bi bi-building"></i>
+                    Administração de Empresas
+                </h1>
+                <p class="text-white-50 mb-0">Gerencie todas as empresas contratantes do sistema</p>
+            </div>
+            <a href="{% url 'core:home' %}" class="btn btn-gold">
+                <i class="bi bi-house-fill"></i>
+                Voltar ao Sistema
+            </a>
+        </div>
+    </div>
+</div>
+
+<div class="container">
+    <!-- Estatísticas -->
+    <div class="row mb-4">
+        <div class="col-md-3 mb-3">
+            <div class="stats-card">
+                <div class="stats-icon total">
+                    <i class="bi bi-building-fill"></i>
+                </div>
+                <div class="stats-number">{{ stats.total }}</div>
+                <div class="stats-label">Total de Empresas</div>
+            </div>
+        </div>
+        <div class="col-md-3 mb-3">
+            <div class="stats-card">
+                <div class="stats-icon ativas">
+                    <i class="bi bi-check-circle-fill"></i>
+                </div>
+                <div class="stats-number">{{ stats.ativas }}</div>
+                <div class="stats-label">Empresas Ativas</div>
+            </div>
+        </div>
+        <div class="col-md-3 mb-3">
+            <div class="stats-card">
+                <div class="stats-icon teste">
+                    <i class="bi bi-clock-fill"></i>
+                </div>
+                <div class="stats-number">{{ stats.teste }}</div>
+                <div class="stats-label">Em Teste</div>
+            </div>
+        </div>
+        <div class="col-md-3 mb-3">
+            <div class="stats-card">
+                <div class="stats-icon bloqueadas">
+                    <i class="bi bi-lock-fill"></i>
+                </div>
+                <div class="stats-number">{{ stats.bloqueadas }}</div>
+                <div class="stats-label">Bloqueadas</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Filtros -->
+    <div class="filter-card">
+        <form method="get" class="row g-3">
+            <div class="col-md-4">
+                <div class="search-box">
+                    <i class="bi bi-search"></i>
+                    <input type="text" name="search" class="form-control" placeholder="Buscar por nome ou CNPJ..." value="{{ search }}">
+                </div>
+            </div>
+            <div class="col-md-3">
+                <select name="status" class="form-select">
+                    <option value="">Todos os Status</option>
+                    <option value="ativo" {% if status_filter == 'ativo' %}selected{% endif %}>Ativo</option>
+                    <option value="teste" {% if status_filter == 'teste' %}selected{% endif %}>Em Teste</option>
+                    <option value="bloqueado" {% if status_filter == 'bloqueado' %}selected{% endif %}>Bloqueado</option>
+                    <option value="vencido" {% if status_filter == 'vencido' %}selected{% endif %}>Vencido</option>
+                    <option value="expirado" {% if status_filter == 'expirado' %}selected{% endif %}>Expirado</option>
+                </select>
+            </div>
+            <div class="col-md-3">
+                <select name="plano" class="form-select">
+                    <option value="">Todos os Planos</option>
+                    <option value="padrao" {% if plano_filter == 'padrao' %}selected{% endif %}>Padrão</option>
+                    <option value="pro" {% if plano_filter == 'pro' %}selected{% endif %}>Pro</option>
+                </select>
+            </div>
+            <div class="col-md-2">
+                <button type="submit" class="btn btn-gold w-100">
+                    <i class="bi bi-funnel-fill"></i>
+                    Filtrar
+                </button>
+            </div>
+        </form>
+    </div>
+
+    <!-- Lista de Empresas -->
+    {% if empresas %}
+        {% for empresa in empresas %}
+        <div class="empresa-card {{ empresa.status }}">
+            <div class="empresa-info">
+                <div class="empresa-dados flex-grow-1">
+                    <h5>
+                        {{ empresa.nome_razao }}
+                        <span class="status-badge {{ empresa.status }}">{{ empresa.get_status_display }}</span>
+                        <span class="plano-badge">{{ empresa.get_plano_display }}</span>
+                    </h5>
+                    <p><i class="bi bi-card-text"></i> <strong>CNPJ/CPF:</strong> {{ empresa.cnpj_cpf }}</p>
+                    <p><i class="bi bi-calendar-event"></i> <strong>Vencimento:</strong> 
+                        {% if empresa.vencimento %}
+                            {{ empresa.vencimento|date:"d/m/Y" }}
+                            {% if empresa.dias_vencimento < 0 %}
+                                <span class="vencimento-info vencido">Vencido há {{ empresa.dias_vencimento_abs }} dias</span>
+                            {% elif empresa.dias_vencimento <= 7 %}
+                                <span class="vencimento-info proximo">Vence em {{ empresa.dias_vencimento }} dias</span>
+                            {% else %}
+                                <span class="vencimento-info ok">{{ empresa.dias_vencimento }} dias restantes</span>
+                            {% endif %}
+                        {% else %}
+                            <span class="text-muted">Não definido</span>
+                        {% endif %}
+                    </p>
+                </div>
+                
+                <div class="empresa-stats">
+                    <div class="stat-item">
+                        <div class="number">{{ empresa.total_usuarios }}/{{ empresa.num_usuarios }}</div>
+                        <div class="label">Usuários</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="number">{{ empresa.total_empresas_emissoras }}/{{ empresa.num_empresas }}</div>
+                        <div class="label">Empresas</div>
+                    </div>
+                </div>
+                
+                <div class="d-flex gap-2">
+                    <a href="{% url 'accounts:admin_empresa_detalhes' empresa.id %}" class="btn btn-outline-primary btn-action">
+                        <i class="bi bi-eye-fill"></i>
+                        Detalhes
+                    </a>
+                    
+                    <form method="post" action="{% url 'accounts:admin_empresa_toggle_status' empresa.id %}" style="display: inline;">
+                        {% csrf_token %}
+                        {% if empresa.status == 'bloqueado' %}
+                            <button type="submit" class="btn btn-action ativar" onclick="return confirm('Deseja ATIVAR esta empresa?')">
+                                <i class="bi bi-unlock-fill"></i>
+                                Ativar
+                            </button>
+                        {% else %}
+                            <button type="submit" class="btn btn-action bloquear" onclick="return confirm('Deseja BLOQUEAR esta empresa?')">
+                                <i class="bi bi-lock-fill"></i>
+                                Bloquear
+                            </button>
+                        {% endif %}
+                    </form>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    {% else %}
+        <div class="text-center py-5">
+            <i class="bi bi-inbox" style="font-size: 4rem; color: #ccc;"></i>
+            <p class="text-muted mt-3">Nenhuma empresa encontrada</p>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

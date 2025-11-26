@@ -34,8 +34,15 @@ class CertificadoService:
         """
         # Caminhos dos arquivos
         cnpj_limpo = empresa.cnpj.replace('.', '').replace('/', '').replace('-', '')
-        # O certificado está em media/certificados/
-        pfx_path = os.path.join(settings.MEDIA_ROOT, 'certificados', empresa.certificado_arquivo)
+        
+        # Tenta encontrar o certificado em múltiplos locais
+        # 1. Pasta certificados no BASE_DIR (produção e desenvolvimento)
+        pfx_path = os.path.join(settings.BASE_DIR, 'certificados', empresa.certificado_arquivo)
+        
+        # 2. Se não encontrar, tenta em MEDIA_ROOT/certificados
+        if not os.path.exists(pfx_path):
+            pfx_path = os.path.join(settings.MEDIA_ROOT, 'certificados', empresa.certificado_arquivo)
+        
         pem_path = os.path.join(self.cert_dir, f"{cnpj_limpo}.pem")
         
         # Se PEM já existe, retorna

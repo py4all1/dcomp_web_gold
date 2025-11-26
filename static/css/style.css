@@ -162,6 +162,12 @@ body {
     text-align: center;
 }
 
+.nav-divider {
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(255, 215, 0, 0.3), transparent);
+    margin: 0.5rem 1rem;
+}
+
 .nav-text {
     white-space: nowrap;
     transition: opacity var(--transition-speed);
