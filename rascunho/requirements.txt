@@ -1,0 +1,4 @@
+requests
+signxml
+lxml
+cryptography

@@ -1,0 +1,79 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<DPS xmlns="http://www.sped.fazenda.gov.br/nfse" versao="1.00">
+    <infDPS Id="DPS310620013329148800010211111123456789112345">
+        <tpAmb>1</tpAmb>
+        <dhEmi>2025-11-21T20:03:47-03:00</dhEmi>
+        <verAplic>1.4.0</verAplic>
+        <serie>11111</serie>
+        <nDPS>123456789112345</nDPS>
+        <dCompet>2024-11-21</dCompet>
+        <tpEmit>1</tpEmit>
+        <cLocEmi>3106200</cLocEmi>
+        <prest>
+            <CNPJ>33291488000102</CNPJ>
+            <xNome>Empresa Prestadora Teste Ltda</xNome>
+            <regTrib>
+                <opSimpNac>1</opSimpNac>
+                <regEspTrib>0</regEspTrib>
+            </regTrib>
+        </prest>
+        <toma>
+            <CNPJ>47960950000121</CNPJ>
+            <xNome>Tomador de Serviços Teste Ltda</xNome>
+            <end>
+                <endNac>
+                    <cMun>3106200</cMun>
+                    <CEP>02000000</CEP>
+                </endNac>
+                <xLgr>Avenida Tomador</xLgr>
+                <nro>789</nro>
+                <xBairro>Bairro Tomador</xBairro>
+            </end>
+        </toma>
+        <serv>
+            <locPrest>
+                <cLocPrestacao>3550308</cLocPrestacao>
+            </locPrest>
+            <cServ>
+                <cTribNac>010101</cTribNac>
+                <xDescServ>Descrição completa do serviço</xDescServ>
+            </cServ>
+        </serv>
+        <valores>
+            <vServPrest>
+                <vServ>0.10</vServ>
+            </vServPrest>
+            <trib>
+                <tribMun>
+                    <tribISSQN>1</tribISSQN>
+                    <tpRetISSQN>1</tpRetISSQN>
+                    <pAliq>0.10</pAliq>
+                </tribMun>
+                <totTrib>
+                    <indTotTrib>0</indTotTrib>
+                </totTrib>
+            </trib>
+        </valores>
+    </infDPS>
+    <ds:Signature xmlns:ds="http://www.w3.org/2000/09/xmldsig#">
+        <ds:SignedInfo>
+            <ds:CanonicalizationMethod Algorithm="http://www.w3.org/2001/10/xml-exc-c14n#"/>
+            <ds:SignatureMethod Algorithm="http://www.w3.org/2001/04/xmldsig-more#rsa-sha256"/>
+            <ds:Reference URI="#DPS310620013329148800010211111123456789112345">
+                <ds:Transforms>
+                    <ds:Transform Algorithm="http://www.w3.org/2000/09/xmldsig#enveloped-signature"/>
+                    <ds:Transform Algorithm="http://www.w3.org/2001/10/xml-exc-c14n#"/>
+                </ds:Transforms>
+                <ds:DigestMethod Algorithm="http://www.w3.org/2001/04/xmlenc#sha256"/>
+                <ds:DigestValue>D+F0tLyUfaPe08QGD5gQBFZ152co5xMcm5T0gRa1h98=</ds:DigestValue>
+            </ds:Reference>
+        </ds:SignedInfo>
+        <ds:SignatureValue>VIRtX+mLUX7RwoWUDuP5bQ66S7V0RDVL/C1f0nJ27uJ4v5uCG3a7gqiH73uq/i/B+HFAw7SWuVvMhoPt9AkmLLBbmqNhMuF5EJG8LywbH9mbwncHJNrbi1VcoXXCxnVMegTxz3KqNc5MbeaXUEeoz1myYdUMDlPu4aSeImm2Vw0FGsPRcTEDG7LIXhB9F3So+DAywrP+kXfuIo0zjkDJWCs3E6NFs2hiaMHtXuwkb7TbRLhSjhztBfBIOc2lYG26jxLszPt65DoTsS98eLPZzfSeFyi0jVIkeCAhffAgt+ROQ1YsqUH64yYfztr2D3c/W8YqoCSYOI4pLAAETy3J8w==</ds:SignatureValue>
+        <ds:KeyInfo>
+            <ds:X509Data>
+                <ds:X509Certificate>MIIHdDCCBVygAwIBAgIMFllkbGHtbk1W3goWMA0GCSqGSIb3DQEBCwUAMIGJMQsw CQYDVQQGEwJCUjETMBEGA1UECgwKSUNQLUJyYXNpbDE2MDQGA1UECwwtU2VjcmV0 YXJpYSBkYSBSZWNlaXRhIEZlZGVyYWwgZG8gQnJhc2lsIC0gUkZCMS0wKwYDVQQD DCRBdXRvcmlkYWRlIENlcnRpZmljYWRvcmEgU0VSUFJPUkZCdjUwHhcNMjUwOTIw MTEyMjUyWhcNMjYwOTIwMTEyMjUyWjCCAQ0xCzAJBgNVBAYTAkJSMQswCQYDVQQI DAJNRzEXMBUGA1UEBwwOQkVMTyBIT1JJWk9OVEUxEzARBgNVBAoMCklDUC1CcmFz aWwxGTAXBgNVBAsMEHZpZGVvY29uZmVyZW5jaWExFzAVBgNVBAsMDjQyOTA5MTEy MDAwMTAwMTYwNAYDVQQLDC1TZWNyZXRhcmlhIGRhIFJlY2VpdGEgRmVkZXJhbCBk byBCcmFzaWwgLSBSRkIxETAPBgNVBAsMCEFST05DRVJUMRYwFAYDVQQLDA1SRkIg ZS1DTlBKIEExMSwwKgYDVQQDDCNQWVRBWCBTT0xVVElPTlMgTFREQTozMzI5MTQ4 ODAwMDEwMjCCASIwDQYJKoZIhvcNAQEBBQADggEPADCCAQoCggEBAJ84kUJB9r1D iF6CpjucUWQ01b4D5Nvb0VXqiheyuj+2nucRwQeraCctRmlNpuV3sTa3BHz8J0ya cYW+BFbhu4gn76qcK4+s9e3A7N4IqBSB7IGj8M8BobyV2GBb9GRk/L2Xhkrhi7Uv ReW1B8WTZj02AFqVDyIWu/O1oCKGGg5UdVoxFxWwPAfXpvFexyQCM4eGFeukTH0a 1DR0PJ2hN/KES9uyZ/OO60skrhv6lCvgF9b99pngSZloKlmlGdVe96m6b/XwNY96 FQtTg0Eu9t0lkv1dXyCNwtNMcGnqxvtX7Z2A+0Pt0C6WrthDV/rO2taZlPCf0kkk vl7gLnKDTccCAwEAAaOCAlMwggJPMB8GA1UdIwQYMBaAFBSALZ1+mkXA8Vs/GdVA sG8vZeDpMA4GA1UdDwEB/wQEAwIF4DBbBgNVHSAEVDBSMFAGBmBMAQIBCjBGMEQG CCsGAQUFBwIBFjhodHRwOi8vcmVwb3NpdG9yaW8uc2VycHJvLmdvdi5ici9kb2Nz L2RwY2Fjc2VycHJvcmZiLnBkZjCBvAYDVR0RBIG0MIGxoDgGBWBMAQMEoC8ELTA2 MTExOTg2MzUwOTc1OTg4NTcwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMKArBgVg TAEDAqAiBCBOSUNPTEFTIEFOVE9OSU8gREUgQUxNRUlEQSBTSUxWQaAZBgVgTAED A6AQBA4zMzI5MTQ4ODAwMDEwMqAXBgVgTAEDB6AOBAwwMDAwMDAwMDAwMDCBFG5p Y29sYXNAcHl0YXguY29tLmJyMB0GA1UdJQQWMBQGCCsGAQUFBwMCBggrBgEFBQcD BDCBiAYDVR0fBIGAMH4wPKA6oDiGNmh0dHA6Ly9yZXBvc2l0b3Jpby5zZXJwcm8u Z292LmJyL2xjci9hY3NlcnByb3JmYnY1LmNybDA+oDygOoY4aHR0cDovL2NlcnRp ZmljYWRvczIuc2VycHJvLmdvdi5ici9sY3IvYWNzZXJwcm9yZmJ2NS5jcmwwVgYI KwYBBQUHAQEESjBIMEYGCCsGAQUFBzAChjpodHRwOi8vcmVwb3NpdG9yaW8uc2Vy cHJvLmdvdi5ici9jYWRlaWFzL2Fjc2VycHJvcmZidjUucDdiMA0GCSqGSIb3DQEB CwUAA4ICAQAwGPC4zutlAJtbhE5M3f4wXCTYzatk30n/wD4xYJkh/cIwbv8qhWzE HzZtBtx7x0Bp8sdeiKGu83y9kYNOJLQVjNmNb3m1l+6ArTSRYwujxLSYIJo9aljq l8r1bHSaIUMcBY3ctaykVMEx5YCFj80rxvPR7PqTpU1uCXhqnpR5dXAUsNiVp7fs M7EPwLdshO5AblOyvxcK78e1iJQF6BuKPw7olOijKu331hHdVqIoqV6AI4xlpGHJ iNCP4HXNv0/zCwf4dfQPgMXBZgbG2aB/MYp/ht7l3MOTktQBVqGLKsouVY4YDoXK It5y42l2wNdbNwmt/fMIiEvsMeLbEeGHoEFF0M6wsptsLu7J8fK4C4DJcbFDPtba nkxDsybqniCToA+cS6kj7en0w6FA1WlGxWufue/I+R8Hunb0ADwY/FkTh0nT/XeR PeAzKNBE2vmR8ohMYwVE+Ii3qfYfe/cKV2eZNFScO9KSADKOaCemO4q+sZHaKUaU GJ9CSZ/Rl+4pHNMiXCkgNyE3hnWoxgrTSuhyDBEIAxLWdhNn+RP4QJ4N3c2mJNon seXWW1IX2sNpf57aG9Dl2KbRSJw87jmzu1Wa2GLIL0IRKJIZS/B/qnWzUbYM5b36 So6bDiVKewCeOEReF5Qzab5/inrdSJWkmsSG71edGhA0dGW4y1RgCQ==
+                </ds:X509Certificate>
+            </ds:X509Data>
+        </ds:KeyInfo>
+    </ds:Signature>
+</DPS>
