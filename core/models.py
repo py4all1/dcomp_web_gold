@@ -194,7 +194,7 @@ class NotaFiscalSP(models.Model):
     cnpj_contribuinte = models.CharField('CNPJ Contribuinte', max_length=18, blank=True, null=True)
     
     # Dados do Tomador
-    cnpj_cpf_tomador = models.CharField('CNPJ/CPF Tomador', max_length=18)
+    cnpj_cpf_tomador = models.CharField('CNPJ/CPF Tomador', max_length=18, blank=True, null=True)
     nome_tomador = models.CharField('Nome/Razão Social Tomador', max_length=255)
     cep_tomador = models.CharField('CEP', max_length=10, blank=True, null=True)
     logradouro_tomador = models.CharField('Logradouro', max_length=255, blank=True, null=True)

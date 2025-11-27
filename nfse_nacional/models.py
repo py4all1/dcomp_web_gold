@@ -25,7 +25,7 @@ class NotaFiscalNacional(models.Model):
     cnpj_contribuinte = models.CharField('CNPJ Contribuinte', max_length=18, help_text='CNPJ da empresa emissora')
     
     # Dados do Tomador
-    cnpj_cpf_tomador = models.CharField('CNPJ/CPF Tomador', max_length=18)
+    cnpj_cpf_tomador = models.CharField('CNPJ/CPF Tomador', max_length=18, blank=True, null=True)
     nome_tomador = models.CharField('Nome/Razão Social', max_length=200)
     inscricao_municipal_tomador = models.CharField('Inscrição Municipal', max_length=50, blank=True, null=True)
     

@@ -135,8 +135,15 @@ class EventoNFeDjango:
         data_rps = nota_fiscal.data_emissao.strftime('%Y-%m-%d') if nota_fiscal.data_emissao else datetime.now().strftime('%Y-%m-%d')
         
         # Determina se é CPF ou CNPJ do tomador
-        cnpj_cpf_tomador = nota_fiscal.cnpj_cpf_tomador.replace('.', '').replace('/', '').replace('-', '')
-        indicador_cnpj_cpf = "1" if len(cnpj_cpf_tomador) <= 11 else "2"
+        # Se não tiver CNPJ/CPF, usa tipo 3 (Não Informado) para assinatura
+        # O campo CPFCNPJTomador será omitido do XML quando não houver documento
+        if nota_fiscal.cnpj_cpf_tomador:
+            cnpj_cpf_tomador = nota_fiscal.cnpj_cpf_tomador.replace('.', '').replace('/', '').replace('-', '')
+            indicador_cnpj_cpf = "1" if len(cnpj_cpf_tomador) <= 11 else "2"
+        else:
+            # Tipo 3 = Não Informado (usado na assinatura quando não há documento)
+            cnpj_cpf_tomador = "00000000000000"  # 14 zeros
+            indicador_cnpj_cpf = "3"  # Não Informado
         
         # Data de emissão (usa data atual se não tiver)
         data_emissao = nota_fiscal.data_emissao if nota_fiscal.data_emissao else datetime.now().date()
@@ -215,11 +222,13 @@ class EventoNFeDjango:
         ET.SubElement(rps, "ISSRetido").text = "true" if nota_fiscal.iss_retido else "false"
         
         # Tomador
-        cpfcnpj_tomador_elem = ET.SubElement(rps, "CPFCNPJTomador")
-        if len(cnpj_cpf_tomador) <= 11:
-            ET.SubElement(cpfcnpj_tomador_elem, "CPF").text = cnpj_cpf_tomador
-        else:
-            ET.SubElement(cpfcnpj_tomador_elem, "CNPJ").text = cnpj_cpf_tomador
+        # Só inclui CPFCNPJTomador se houver CNPJ/CPF válido
+        if nota_fiscal.cnpj_cpf_tomador:
+            cpfcnpj_tomador_elem = ET.SubElement(rps, "CPFCNPJTomador")
+            if len(cnpj_cpf_tomador) <= 11:
+                ET.SubElement(cpfcnpj_tomador_elem, "CPF").text = cnpj_cpf_tomador
+            else:
+                ET.SubElement(cpfcnpj_tomador_elem, "CNPJ").text = cnpj_cpf_tomador
         
         if nota_fiscal.nome_tomador:
             ET.SubElement(rps, "RazaoSocialTomador").text = nota_fiscal.nome_tomador
